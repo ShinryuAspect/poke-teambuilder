@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $idUsuario = $_SESSION['usuario']['id'];
 
         if ($equipoModel->guardar($idUsuario, $nombreEquipo, $formatoTier, $pokemonPost)) {
-            $mensajeExito = "¡Equipo guardado con éxito en la base de datos!";
+            $mensajeExito = "¡Equipo completo guardado con éxito en la base de datos!";
         } else {
             $mensajeError = "Hubo un error crítico al procesar y guardar el equipo.";
         }
@@ -71,73 +71,48 @@ require_once 'header.php';
         <h3>Integrantes del Equipo (Slots)</h3>
         <div class="grid-pokemon">
             
-            <div class="pokemon-slot">
-                <h3>Pokémon #1</h3>
-                <div class="form-group">
-                    <label>Especie (Nombre)</label>
-                    <input type="text" name="pokemon[0][pokemon_name]" placeholder="Ej: Dragapult" required>
-                </div>
-                <div class="form-inline">
+            <?php
+            for ($i = 0; $i < 6; $i++): 
+                $esObligatorio = ($i === 0) ? 'required' : '';
+            ?>
+                <div class="pokemon-slot">
+                    <h3>Pokémon #<?= ($i + 1) ?></h3>
+                    
                     <div class="form-group">
-                        <label>Objeto</label>
-                        <input type="text" name="pokemon[0][objeto]" placeholder="Choice Specs">
+                        <label>Especie (Nombre)</label>
+                        <input type="text" name="pokemon[<?= $i ?>][pokemon_name]" placeholder="Ej: Dragapult" <?= $esObligatorio ?>>
                     </div>
-                    <div class="form-group">
-                        <label>Habilidad</label>
-                        <input type="text" name="pokemon[0][habilidad]" placeholder="Infiltrator">
+                    
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <label>Objeto</label>
+                            <input type="text" name="pokemon[<?= $i ?>][objeto]" placeholder="Choice Specs">
+                        </div>
+                        <div class="form-group">
+                            <label>Habilidad</label>
+                            <input type="text" name="pokemon[<?= $i ?>][habilidad]" placeholder="Infiltrator">
+                        </div>
                     </div>
-                </div>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <label>Naturaleza</label>
-                        <input type="text" name="pokemon[0][naturaleza]" placeholder="Timid">
+                    
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <label>Naturaleza</label>
+                            <input type="text" name="pokemon[<?= $i ?>][naturaleza]" placeholder="Timid">
+                        </div>
+                        <div class="form-group">
+                            <label>EVs (Repartición)</label>
+                            <input type="text" name="pokemon[<?= $i ?>][evs_reparticion]" placeholder="252 SpA / 252 Spe">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>EVs (Repartición)</label>
-                        <input type="text" name="pokemon[0][evs_reparticion]" placeholder="252 SpA / 252 Spe">
-                    </div>
-                </div>
-                <div class="moves-grid">
-                    <input type="text" name="pokemon[0][movimiento_1]" placeholder="Draco Meteor">
-                    <input type="text" name="pokemon[0][movimiento_2]" placeholder="Shadow Ball">
-                    <input type="text" name="pokemon[0][movimiento_3]" placeholder="Flamethrower">
-                    <input type="text" name="pokemon[0][movimiento_4]" placeholder="U-turn">
-                </div>
-            </div>
-
-            <div class="pokemon-slot">
-                <h3>Pokémon #2</h3>
-                <div class="form-group">
-                    <label>Especie (Nombre)</label>
-                    <input type="text" name="pokemon[1][pokemon_name]" placeholder="Ej: Gholdengo">
-                </div>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <label>Objeto</label>
-                        <input type="text" name="pokemon[1][objeto]" placeholder="Air Balloon">
-                    </div>
-                    <div class="form-group">
-                        <label>Habilidad</label>
-                        <input type="text" name="pokemon[1][habilidad]" placeholder="Good as Gold">
+                    
+                    <div class="moves-grid">
+                        <input type="text" name="pokemon[<?= $i ?>][movimiento_1]" placeholder="Movimiento 1">
+                        <input type="text" name="pokemon[<?= $i ?>][movimiento_2]" placeholder="Movimiento 2">
+                        <input type="text" name="pokemon[<?= $i ?>][movimiento_3]" placeholder="Movimiento 3">
+                        <input type="text" name="pokemon[<?= $i ?>][movimiento_4]" placeholder="Movimiento 4">
                     </div>
                 </div>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <label>Naturaleza</label>
-                        <input type="text" name="pokemon[1][naturaleza]" placeholder="Modest">
-                    </div>
-                    <div class="form-group">
-                        <label>EVs (Repartición)</label>
-                        <input type="text" name="pokemon[1][evs_reparticion]" placeholder="252 SpA / 252 Spe">
-                    </div>
-                </div>
-                <div class="moves-grid">
-                    <input type="text" name="pokemon[1][movimiento_1]" placeholder="Make It Rain">
-                    <input type="text" name="pokemon[1][movimiento_2]" placeholder="Shadow Ball">
-                    <input type="text" name="pokemon[1][movimiento_3]" placeholder="Nasty Plot">
-                    <input type="text" name="pokemon[1][movimiento_4]" placeholder="Recover">
-                </div>
-            </div>
+            <?php endfor; ?>
 
         </div>
 
