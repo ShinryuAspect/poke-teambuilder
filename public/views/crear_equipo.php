@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = "Construir Equipo";
 $cssFile = "dashboard";
-$jsFile = null; 
+$jsFile = "teamBuilder";
 
 require_once 'header.php';
 ?>
