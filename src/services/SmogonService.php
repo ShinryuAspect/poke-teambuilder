@@ -1,22 +1,44 @@
 <?php
 class SmogonService {
     public function buscarEspecie(string $query): array {
-        $pokemonDataset = [
-            'Bulbasaur', 'Ivysaur', 'Venusaur', 'Charmander', 'Charmeleon', 'Charizard',
-            'Squirtle', 'Wartortle', 'Blastoise', 'Pikachu', 'Dragapult', 'Dragonite',
-            'Gholdengo', 'Garchomp', 'Great Tusk', 'Kingambit', 'Roaring Moon', 'Iron Valiant',
-            'Ting-Lu', 'Chien-Pao', 'Chi-Yu', 'Wo-Chien', 'Ogerpon', 'Ursaluna'
-        ];
+        $queryMinuscula = strtolower(trim($query));
+        
+        $url = "https://pokeapi.co/api/v2/pokemon?limit=1000";
 
-        $resultados = [];
-        $queryMinuscula = strtolower($query);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'PokemonTeamBuilderApp/1.0');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-        foreach ($pokemonDataset as $pokemon) {
-            if (str_contains(strtolower($pokemon), $queryMinuscula)) {
-                $resultados[] = $pokemon;
-            }
+        $respuesta = curl_exec($ch);
+        
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200 || !$respuesta) {
+            return []; 
         }
 
-        return array_slice($resultados, 0, 5);
+        $datos = json_decode($respuesta, true);
+        if (!$datos || !isset($datos['results'])) {
+            return [];
+        }
+
+        $resultados = [];
+        foreach ($datos['results'] as $pokemon) {
+            $nombreConstruido = ucfirst($pokemon['name']);
+            
+            if (str_contains(strtolower($nombreConstruido), $queryMinuscula)) {
+                $resultados[] = $nombreConstruido;
+            }
+            
+            if (count($resultados) >= 5) {
+                break;
+            }
+        }
+        
+        return $resultados;
     }
 }
