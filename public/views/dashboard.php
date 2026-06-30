@@ -70,9 +70,13 @@ require_once 'header.php';
                             <td><span class="tier-badge"><?= htmlspecialchars($equipo['formato_tier']) ?></span></td>
                             <td><?= date('d/m/Y H:i', strtotime($equipo['fecha_creacion'])) ?></td>
                             <td>
+                                <button type="button" class="btn-ia action-analyze" data-id="<?= $equipo['id'] ?>">
+                                    🤖 Analizar con IA
+                                </button>
+                                
                                 <a href="dashboard.php?action=eliminar&id=<?= $equipo['id'] ?>" 
-                                   class="btn-delete action-delete">
-                                   ❌ Eliminar
+                                class="btn-delete action-delete">
+                                ❌ Eliminar
                                 </a>
                             </td>
                         </tr>
@@ -84,6 +88,21 @@ require_once 'header.php';
                 <p>Aún no has guardado ningún equipo. ¡Haz clic en "+ Crear Nuevo Equipo" para empezar!</p>
             </div>
         <?php endif; ?>
+    </div>
+</div>
+
+<div id="modal-ia" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 id="modal-titulo">🧠 Análisis Táctico de Gemini AI</h2>
+        <hr>
+        
+        <div id="ia-loader" class="ia-loader-container">
+            <div class="spinner"></div>
+            <p>Gemini está analizando la cobertura de tipos, debilidades y sinergias competitivas de tu equipo... Por favor, espera.</p>
+        </div>
+        
+        <div id="ia-resultado" class="ia-resultado-markdown"></div>
     </div>
 </div>
 
