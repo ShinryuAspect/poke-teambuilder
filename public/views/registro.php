@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensajeError = "Todos los campos son obligatorios.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $mensajeError = "El formato del correo electrónico no es válido.";
-    } elseif (strlen($password) < 8) {
-        $mensajeError = "La contraseña debe tener al menos 8 caracteres.";
+    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+        $mensajeError = "La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&).";
     } elseif ($password !== $password_confirm) {
         $mensajeError = "Las contraseñas no coinciden.";
     } else {

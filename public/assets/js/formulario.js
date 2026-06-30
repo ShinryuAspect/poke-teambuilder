@@ -30,9 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const passwordInput = document.getElementById('password');
-        if (passwordInput && passwordInput.value.length < 8) {
-            marcarError(passwordInput, 'La contraseña debe tener al menos 8 caracteres.');
-            contenedorErrores.push(true);
+        if (passwordInput) {
+            const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            
+            if (!regexPassword.test(passwordInput.value)) {
+                marcarError(
+                    passwordInput, 
+                    'La contraseña debe tener al menos 8 caracteres, e incluir una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&).'
+                );
+                contenedorErrores.push(true);
+            }
         }
 
         const passwordConfirmInput = document.getElementById('password_confirm');
