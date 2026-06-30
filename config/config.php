@@ -3,10 +3,26 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'poke_teambuilder');
+if (!defined('DB_HOST')) {
+    define('DB_HOST', 'localhost');
+}
 
-define('GEMINI_API_KEY', 'AIzaSyDYSeMjHf6y0MZdhALTp8MtpjJlewWAngU');
-define('BASE_URL', 'http://localhost/poke-teambuilder/');
+if (!defined('DB_USER')) {
+    define('DB_USER', 'root');
+}
+
+if (!defined('DB_PASS')) {
+    define('DB_PASS', '');
+}
+
+if (!defined('DB_NAME')) {
+    define('DB_NAME', 'poke_teambuilder');
+}
+
+if (!defined('GEMINI_API_KEY')) {
+    define('GEMINI_API_KEY', 'AIzaSyDYSeMjHf6y0MZdhALTp8MtpjJlewWAngU');
+}
+
+if (!defined('BASE_URL')) {
+    define('BASE_URL', 'http://localhost/poke-teambuilder/');
+}
