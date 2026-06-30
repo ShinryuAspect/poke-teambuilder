@@ -28,17 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-?>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Pokémon Team Builder</title>
-    <link rel="stylesheet" href="../assets/css/auth.css">
-</head>
-<body>
+$pageTitle = "Crear Cuenta";
+$cssFile = "auth";
+$jsFile = "formulario";
+
+require_once 'header.php';
+?>
 
 <div class="auth-container">
     <h2>Crear Cuenta</h2>
@@ -82,6 +78,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<script src="../assets/js/formulario.js"></script>
-</body>
-</html>
+<?php require_once 'footer.php'; ?>

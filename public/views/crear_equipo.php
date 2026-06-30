@@ -28,16 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+$pageTitle = "Construir Equipo";
+$cssFile = "dashboard";
+$jsFile = null; 
+
+require_once 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Equipo - Pokémon Team Builder</title>
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-</head>
-<body>
 
 <div class="container">
     <div class="header-actions">
@@ -149,5 +146,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 </div>
 
-</body>
-</html>
+<?php require_once 'footer.php'; ?>

@@ -29,16 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+$pageTitle = "Iniciar Sesión";
+$cssFile = "auth";
+$jsFile = "formulario";
+
+require_once 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Pokémon Team Builder</title>
-    <link rel="stylesheet" href="../assets/css/auth.css">
-</head>
-<body>
 
 <div class="auth-container">
     <h2>Iniciar Sesión</h2>
@@ -67,6 +64,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<script src="../assets/js/formulario.js"></script>
-</body>
-</html>
+<?php require_once 'footer.php'; ?>
