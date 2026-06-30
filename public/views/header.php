@@ -1,4 +1,32 @@
-<?php require_once __DIR__ . '/../../config/config.php'; ?>
+<?php
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/database.php';
+
+if (isset($_SESSION['usuario'])) {
+    try {
+        $db = Database::conectar();
+        $stmt = $db->prepare("SELECT id FROM usuarios WHERE id = ?");
+        $stmt->execute([$_SESSION['usuario']['id']]);
+        
+        if (!$stmt->fetch()) {
+            $_SESSION = [];
+            if (ini_get("session.use_cookies")) {
+                $params = session_get_cookie_params();
+                setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+            }
+            session_destroy();
+            
+            header('Location: login.php');
+            exit();
+        }
+    } catch (PDOException $e) {
+        $_SESSION = [];
+        session_destroy();
+        header('Location: login.php');
+        exit();
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="es">
