@@ -1,7 +1,15 @@
-let pokeCache = [];
+const DB_NAME = 'PokeAppCacheDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'pokemon_lists';
+let db;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await precargarListaPokemon();
+    try {
+        db = await inicializarDB();
+        await inicializarCachePokemon();
+    } catch (err) {
+        console.error("Error al preparar la base de datos de caché:", err);
+    }
 
     const pokemonInputs = document.querySelectorAll('.input-pokemon');
 
@@ -10,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const slotId = card.dataset.slot;
         const dropdown = input.nextElementSibling;
 
-        input.addEventListener('input', (e) => {
+        input.addEventListener('input', async (e) => {
             const query = e.target.value.trim().toLowerCase();
 
             if (query.length === 0) {
@@ -24,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            const pokeCache = await obtenerPokemonDeDB();
             const filtrados = pokeCache
                 .filter(p => p.includes(query))
                 .slice(0, 5);
@@ -31,9 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderSugerencias(filtrados, input, dropdown, slotId);
         });
 
-        input.addEventListener('focus', (e) => {
-            const query = e.target.value.trim().toLowerCase();
+        input.addEventListener('focus', async () => {
+            const query = input.value.trim().toLowerCase();
             if (query.length >= 2) {
+                const pokeCache = await obtenerPokemonDeDB();
                 const filtrados = pokeCache.filter(p => p.includes(query)).slice(0, 5);
                 renderSugerencias(filtrados, input, dropdown, slotId);
             }
@@ -47,15 +57,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-async function precargarListaPokemon() {
+function inicializarDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (e) => {
+            const database = e.target.result;
+            if (!database.objectStoreNames.contains(STORE_NAME)) {
+                database.createObjectStore(STORE_NAME);
+            }
+        };
+
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function inicializarCachePokemon() {
+    const cachedData = await obtenerPokemonDeDB();
+
+    if (cachedData && cachedData.length > 0) {
+        console.log(`📦 [IndexedDB] ${cachedData.length} Pokémon restaurados desde la base de datos local.`);
+        return;
+    }
+
+    console.log("🌐 [PokeAPI] Descargando catálogo por primera vez...");
     try {
         const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
         const data = await res.json();
-        pokeCache = data.results.map(p => p.name);
-        console.log(`📦 [Caché] ${pokeCache.length} Pokémon listos en memoria local.`);
+        const listaNombres = data.results.map(p => p.name);
+
+        await guardarPokemonEnDB(listaNombres);
+        console.log("💾 [IndexedDB] Catálogo guardado con éxito en el almacenamiento local.");
     } catch (err) {
-        console.error("No se pudo precargar la lista de Pokémon:", err);
+        console.error("Error al poblar la base de datos desde la API:", err);
     }
+}
+
+function guardarPokemonEnDB(lista) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put(lista, 'lista_maestra');
+
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+function obtenerPokemonDeDB() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get('lista_maestra');
+
+        request.onsuccess = (e) => resolve(e.target.result || []);
+        request.onerror = (e) => reject(e.target.error);
+    });
 }
 
 function renderSugerencias(lista, input, dropdown, slotId) {
@@ -124,7 +182,6 @@ function resetearSlot(slotId) {
 
     spriteImg.src = '../assets/img/unknown.png';
     spriteImg.style.opacity = '1';
-
     typesContainer.innerHTML = `<span class="badge type-unknown">???</span>`;
 
     moveInputs.forEach(moveInput => {
@@ -139,7 +196,6 @@ function resetearSlot(slotId) {
 
 function configurarAutocompletadoMovimientos(input, movimientosLegales) {
     const dropdown = input.nextElementSibling;
-
     const newInput = input.cloneNode(true);
     input.parentNode.replaceChild(newInput, input);
 
