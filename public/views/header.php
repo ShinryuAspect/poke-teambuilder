@@ -34,6 +34,9 @@ if (isset($_SESSION['usuario'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($pageTitle) ? $pageTitle . " - Pokémon Team Builder" : "Pokémon Team Builder" ?></title>
+    
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    
     <?php if (isset($cssFile)): ?>
         <link rel="stylesheet" href="../assets/css/<?= $cssFile ?>.css">
     <?php endif; ?>

@@ -1,5 +1,4 @@
 <?php
-// public/views/crear_equipo.php
 require_once __DIR__ . '/../../config/config.php';
 
 if (!isset($_SESSION['usuario'])) {
@@ -8,22 +7,30 @@ if (!isset($_SESSION['usuario'])) {
 }
 
 $pageTitle = "Construir Equipo - Showdown Style";
-$cssFile = "teamBuilder"; // Cargará nuestro nuevo CSS avanzado
-$jsFile = "teamBuilder";  // Cargará nuestro JS de control dinámico
+$cssFile = "teamBuilder";
+$jsFile = "teamBuilder";
 
 require_once 'header.php';
 ?>
 
 <div class="builder-container">
+    <div class="header-actions">
+        <div>
+            <h2>🛠️ Constructor de Equipos</h2>
+            <p>Diseña tu estrategia competitiva al estilo Showdown.</p>
+        </div>
+        <a href="dashboard.php" class="btn-back">⬅️ Volver al Dashboard</a>
+    </div>
+
     <form id="form-teambuilder" action="guardar_equipo.php" method="POST">
         
         <div class="builder-header card">
             <div class="input-row">
                 <div class="form-group">
                     <label for="nombre_equipo">🏷️ Nombre del Equipo</label>
-                    <input type="text" id="nombre_equipo" name="nombre_equipo" placeholder="Ej: Mi Equipo de Lluvia" required>
+                    <input type="text" id="nombre_equipo" name="nombre_equipo" class="input-team-name" placeholder="Ej: Mi Equipo de Lluvia" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="max-width: 250px;">
                     <label for="formato_tier">🏆 Formato / Tier</label>
                     <select id="formato_tier" name="formato_tier">
                         <option value="Gen 9 OU">Gen 9 OU</option>

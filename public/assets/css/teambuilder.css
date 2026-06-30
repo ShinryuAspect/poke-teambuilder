@@ -4,12 +4,32 @@
     padding: 0 15px;
 }
 
+.builder-container .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.builder-container h2 {
+    margin: 0;
+    color: var(--text-main);
+}
+
+.builder-container p {
+    margin: 5px 0 0 0;
+    color: var(--text-muted);
+}
+
 .builder-header {
-    background: #fff;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     padding: 20px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .input-row {
@@ -29,24 +49,24 @@
 }
 
 .pokemon-card {
-    background: #2b2b2b;
-    color: #fff;
-    border-radius: 8px;
-    border: 1px solid #3d3d3d;
+    background: var(--bg-card);
+    color: var(--text-main);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
     display: flex;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .card-header {
-    background: #1a1a1a;
+    background: rgba(0, 0, 0, 0.2);
     width: 90px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    border-right: 1px solid #3d3d3d;
+    border-right: 1px solid var(--border-color);
 }
 
 .slot-number {
@@ -54,7 +74,7 @@
     top: 5px;
     left: 8px;
     font-size: 12px;
-    color: #888;
+    color: var(--text-muted);
     font-weight: bold;
 }
 
@@ -70,30 +90,43 @@
 }
 
 .relative { position: relative; }
+
 .form-group label {
     display: block;
     font-size: 11px;
     text-transform: uppercase;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 4px;
     font-weight: bold;
 }
 
-.card-body input[type="text"] {
+.card-body input[type="text"], .input-team-name, .builder-header select {
     width: 100%;
-    background: #1a1a1a;
-    border: 1px solid #444;
-    color: #fff;
-    padding: 6px 10px;
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    padding: 10px !important;
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
     margin-bottom: 10px;
 }
 
-.card-body input[type="text"]:focus {
-    border-color: #5e35b1;
+.card-body input[type="text"]:focus, .input-team-name:focus, .builder-header select:focus {
+    border-color: var(--primary) !important;
     outline: none;
+}
+
+.moves-group {
+    margin-top: 15px;
+}
+
+.move-selector-wrapper {
+    margin-bottom: 8px;
+}
+
+.input-move {
+    font-weight: 500;
 }
 
 .type-badges {
@@ -131,17 +164,13 @@
 .type-fairy { background: #EE99AC; }
 .type-normal { background: #A8A878; }
 
-.input-move {
-    font-weight: 500;
-}
-
 .sugerencias-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
-    background: #222;
-    border: 1px solid #444;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
     border-radius: 0 0 4px 4px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     z-index: 99;
@@ -154,28 +183,29 @@
     padding: 8px 12px;
     cursor: pointer;
     font-size: 13px;
-    color: #eee;
+    color: var(--text-main);
     transition: background 0.1s;
 }
 
 .sugerencia-item:hover {
-    background: #3a3a3a;
-    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .builder-footer {
     text-align: right;
+    margin-top: 10px;
 }
 
 .btn-save-team {
     padding: 12px 24px;
-    background: #2e7d32;
+    background: var(--success);
     color: #fff;
     font-weight: bold;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius);
     cursor: pointer;
     font-size: 16px;
+    transition: background 0.2s;
 }
 
-.btn-save-team:hover { background: #1b5e20; }
+.btn-save-team:hover { background: var(--success-hover); }

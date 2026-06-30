@@ -1,0 +1,26 @@
+:root {
+    --bg-main: #141414;
+    --bg-card: #222222;
+    --bg-input: #1a1a1a;
+    --border-color: #3d3d3d;
+    
+    --text-main: #eeeeee;
+    --text-muted: #888888;
+    --primary: #5e35b1;
+    --primary-hover: #4527a0;
+    --success: #2e7d32;
+    --success-hover: #1b5e20;
+    --danger: #c03028;
+    --danger-hover: #a02820;
+
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --radius: 6px;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+}
