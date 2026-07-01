@@ -146,6 +146,8 @@ Aunque el proyecto ya cumple su objetivo principal, se pueden plantear varias me
 - Añadir más formatos de equipo o reglas competitivas si se desea ampliar el alcance de la aplicación.
 - Mejorar el sistema de análisis con métricas más profundas sobre cobertura, amenazas y sinergias del equipo.
 - Incorporar persistencia más avanzada para campos competitivos adicionales como habilidad, EV spread o IV spread si se desea exportar el equipo con mayor fidelidad.
+- Mejorar la integración de PokeAPI (filtrado de habilidades, cálculo teniendo en cuenta un campo de Nivel)
+- Pulir el diseño visual y mejorar experiencia de usuario.
 - Añadir exportación e importación de equipos y Pokémon en formatos compatibles con herramientas externas, como Pokémon Showdown o webs alternativas similares, para facilitar la portabilidad de estrategias.
 - Refactorizar el servicio de búsqueda competitiva para eliminar nombres heredados y dejar la nomenclatura completamente alineada con PokéAPI.
 
@@ -154,12 +156,3 @@ Aunque el proyecto ya cumple su objetivo principal, se pueden plantear varias me
 El proyecto cumple con los objetivos académicos propuestos porque integra frontend dinámico, backend en PHP 8, persistencia en MySQL/MariaDB, seguridad básica, validación y consumo de APIs externas. Además, la solución está estructurada de manera modular, lo que facilita su mantenimiento y evolución.
 
 Como trabajo final, demuestra la capacidad de construir una aplicación web completa con lógica de negocio real, interacción con servicios externos y almacenamiento persistente de datos.
-
-## 10. Sugerencias para la presentación
-
-1. Explicar primero el problema que resuelve la aplicación.
-2. Mostrar el modelo de datos y justificar la estructura elegida.
-3. Demostrar el flujo de autenticación.
-4. Mostrar la creación y edición de un equipo en directo.
-5. Enseñar la carga automática de sprites y stats.
-6. Cerrar con el análisis táctico y las posibilidades de ampliación.
