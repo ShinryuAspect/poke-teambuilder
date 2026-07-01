@@ -54,8 +54,14 @@
     border-radius: var(--radius);
     border: 1px solid var(--border-color);
     display: flex;
-    overflow: hidden;
+    overflow: visible !important; 
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+.pokemon-card:hover,
+.pokemon-card:focus-within {
+    z-index: 50 !important;
 }
 
 .card-header {
@@ -87,9 +93,17 @@
 .card-body {
     flex: 1;
     padding: 15px;
+    overflow: visible !important;
 }
 
-.relative { position: relative; }
+.form-group, .move-selector-wrapper {
+    position: relative !important;
+}
+
+.form-group:focus-within, 
+.move-selector-wrapper:focus-within {
+    z-index: 99999 !important;
+}
 
 .form-group label {
     display: block;
@@ -119,6 +133,7 @@
 
 .moves-group {
     margin-top: 15px;
+    overflow: visible !important;
 }
 
 .move-selector-wrapper {
@@ -165,30 +180,34 @@
 .type-normal { background: #A8A878; }
 
 .sugerencias-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    z-index: 99;
-    max-height: 160px;
-    overflow-y: auto;
-    box-sizing: border-box;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: #222222 !important;
+    border: 1px solid #5e35b1 !important;
+    border-radius: 0 0 4px 4px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.7) !important;
+    
+    z-index: 999999 !important; 
+    
+    max-height: 160px !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    
+    display: none; 
 }
 
 .sugerencia-item {
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text-main);
-    transition: background 0.1s;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    color: #ffffff !important;
+    background-color: #222222 !important;
+    font-size: 13px !important;
 }
 
 .sugerencia-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background-color: #333333 !important;
 }
 
 .builder-footer {
@@ -209,3 +228,30 @@
 }
 
 .btn-save-team:hover { background: var(--success-hover); }
+
+.btn-back {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px !important;
+    background-color: var(--bg-input, #222) !important;
+    color: var(--text-main, #fff) !important;
+    text-decoration: none !important;
+    border-radius: var(--radius, 6px) !important;
+    border: 1px solid var(--border-color, #444) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
+}
+
+.btn-back:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--primary, #5e35b1) !important;
+    transform: translateY(-1px) !important;
+    color: #ffffff !important;
+}
+
+.form-group input:focus + .sugerencias-dropdown, .move-selector-wrapper input:focus + .sugerencias-dropdown, .sugerencias-dropdown:hover {
+    display: block !important;
+}

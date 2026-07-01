@@ -1,4 +1,5 @@
 CREATE DATABASE IF NOT EXISTS poke_teambuilder DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE poke_teambuilder;
 
 -- 1. Tabla de Usuarios
