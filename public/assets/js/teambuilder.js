@@ -1,7 +1,8 @@
 const DB_NAME = 'PokeAppCacheDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE_NAME = 'pokemon_lists';
 const STORE_ITEMS = 'item_lists';
+const STORE_ABILITIES = 'ability_lists';
 let db;
 
 const movimientosPorSlot = {};
@@ -69,6 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		db = await inicializarDB();
 		await inicializarCachePokemon();
 		await inicializarCacheObjetos();
+		await inicializarCacheHabilidades();
 	} catch (err) {
 		console.error('Error al preparar la base de datos de caché:', err);
 	}
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const slotId = card.dataset.slot;
 		const dropdown = input.nextElementSibling;
 
-		input.addEventListener('keyup', (e) => {
+		input.addEventListener('keyup', () => {
 			if (input.value === 'null') input.value = '';
 		});
 
@@ -144,6 +146,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 					.slice(0, 5);
 				renderSugerenciasObjetos(filtrados, input, dropdown);
 			}
+		});
+	});
+
+	const abilityInputs = document.querySelectorAll('.input-ability');
+	abilityInputs.forEach((input) => {
+		const dropdown = input.nextElementSibling;
+
+		input.addEventListener('input', async (e) => {
+			const query = normalizarTextoBuscado(e.target.value);
+			if (query.length < 1) {
+				dropdown.innerHTML = '';
+				return;
+			}
+
+			const habilidadesCache = await obtenerHabilidadesDeDB();
+			const filtradas = habilidadesCache
+				.filter((ability) =>
+					normalizarTextoBuscado(ability).includes(query),
+				)
+				.slice(0, 5);
+			renderSugerenciasHabilidades(filtradas, input, dropdown);
+		});
+
+		input.addEventListener('focus', async () => {
+			const query = normalizarTextoBuscado(input.value);
+			if (query.length >= 1) {
+				const habilidadesCache = await obtenerHabilidadesDeDB();
+				const filtradas = habilidadesCache
+					.filter((ability) =>
+						normalizarTextoBuscado(ability).includes(query),
+					)
+					.slice(0, 5);
+				if (filtradas.length > 0) {
+					renderSugerenciasHabilidades(filtradas, input, dropdown);
+				}
+			}
+		});
+
+		input.addEventListener('blur', () => {
+			input.value = formatearEtiquetaApi(input.value);
 		});
 	});
 
@@ -234,6 +276,9 @@ function inicializarDB() {
 			if (!database.objectStoreNames.contains(STORE_ITEMS)) {
 				database.createObjectStore(STORE_ITEMS);
 			}
+			if (!database.objectStoreNames.contains(STORE_ABILITIES)) {
+				database.createObjectStore(STORE_ABILITIES);
+			}
 		};
 		request.onsuccess = (e) => resolve(e.target.result);
 		request.onerror = (e) => reject(e.target.error);
@@ -282,6 +327,24 @@ async function inicializarCacheObjetos() {
 	}
 }
 
+async function inicializarCacheHabilidades() {
+	const cachedData = await obtenerHabilidadesDeDB();
+	if (cachedData && cachedData.length > 0) return;
+
+	try {
+		const res = await fetch('https://pokeapi.co/api/v2/ability?limit=1000');
+		const data = await res.json();
+		const listaHabilidades = data.results.map((ability) => ability.name);
+
+		const transaction = db.transaction([STORE_ABILITIES], 'readwrite');
+		transaction
+			.objectStore(STORE_ABILITIES)
+			.put(listaHabilidades, 'lista_habilidades');
+	} catch (err) {
+		console.error('Error al poblar IndexedDB con Habilidades:', err);
+	}
+}
+
 function obtenerObjetosDeDB() {
 	return new Promise((resolve, reject) => {
 		const transaction = db.transaction([STORE_ITEMS], 'readonly');
@@ -290,6 +353,32 @@ function obtenerObjetosDeDB() {
 		request.onsuccess = (e) => resolve(e.target.result || []);
 		request.onerror = (e) => reject(e.target.error);
 	});
+}
+
+function obtenerHabilidadesDeDB() {
+	return new Promise((resolve, reject) => {
+		const transaction = db.transaction([STORE_ABILITIES], 'readonly');
+		const store = transaction.objectStore(STORE_ABILITIES);
+		const request = store.get('lista_habilidades');
+		request.onsuccess = (e) => resolve(e.target.result || []);
+		request.onerror = (e) => reject(e.target.error);
+	});
+}
+
+function normalizarTextoBuscado(texto) {
+	return String(texto || '')
+		.toLowerCase()
+		.replace(/[-_]+/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+function formatearEtiquetaApi(texto) {
+	return normalizarTextoBuscado(texto)
+		.split(' ')
+		.filter(Boolean)
+		.map((palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+		.join(' ');
 }
 
 function renderSugerencias(lista, input, dropdown, slotId) {
@@ -343,12 +432,31 @@ function renderSugerenciasMovimientos(lista, input, dropdown) {
 	});
 }
 
+function renderSugerenciasHabilidades(lista, input, dropdown) {
+	dropdown.innerHTML = '';
+	if (lista.length === 0) {
+		dropdown.innerHTML = `<div class="sugerencia-item empty">Habilidad no válida</div>`;
+		return;
+	}
+
+	lista.forEach((abilityName) => {
+		const item = document.createElement('div');
+		item.className = 'sugerencia-item';
+		item.textContent = formatearEtiquetaApi(abilityName);
+		item.addEventListener('click', () => {
+			input.value = item.textContent;
+			dropdown.innerHTML = '';
+		});
+		dropdown.appendChild(item);
+	});
+}
+
 function extraerMovimientosLegales(pokemonMoves) {
 	if (!Array.isArray(pokemonMoves)) {
 		return [];
 	}
 
-	const movimientos = pokemonMoves
+	const movimientosFiltrados = pokemonMoves
 		.filter(
 			(moveEntry) =>
 				Array.isArray(moveEntry.version_group_details) &&
@@ -360,7 +468,31 @@ function extraerMovimientosLegales(pokemonMoves) {
 		.map((moveEntry) => moveEntry.move?.name)
 		.filter(Boolean);
 
-	return [...new Set(movimientos)].sort((a, b) => a.localeCompare(b));
+	if (movimientosFiltrados.length > 0) {
+		return [...new Set(movimientosFiltrados)].sort((a, b) =>
+			a.localeCompare(b),
+		);
+	}
+
+	const movimientosAlternativos = pokemonMoves
+		.map((moveEntry) => moveEntry.move?.name)
+		.filter(Boolean);
+
+	return [...new Set(movimientosAlternativos)].sort((a, b) =>
+		a.localeCompare(b),
+	);
+}
+
+function extraerHabilidadPrincipal(abilities) {
+	if (!Array.isArray(abilities) || abilities.length === 0) {
+		return '';
+	}
+
+	const habilidadPrioritaria =
+		abilities.find((abilityEntry) => !abilityEntry.is_hidden) ||
+		abilities[0];
+
+	return formatearEtiquetaApi(habilidadPrioritaria?.ability?.name || '');
 }
 
 async function cargarDatosPokemon(pokemonName, slotId) {
@@ -373,6 +505,9 @@ async function cargarDatosPokemon(pokemonName, slotId) {
 	const typesContainer = document.getElementById(`types-${slotId}`);
 	const moveInputs = document.querySelectorAll(
 		`[name^="pokemon[${slotId}][moves]"]`,
+	);
+	const abilityInput = document.querySelector(
+		`input[name="pokemon[${slotId}][habilidad]"]`,
 	);
 
 	try {
@@ -448,6 +583,9 @@ async function cargarDatosPokemon(pokemonName, slotId) {
 			});
 
 		movimientosPorSlot[slotId] = extraerMovimientosLegales(data.moves);
+		if (abilityInput) {
+			abilityInput.value = extraerHabilidadPrincipal(data.abilities);
+		}
 
 		moveInputs.forEach((moveInput) => {
 			moveInput.disabled = false;
@@ -671,6 +809,9 @@ function resetearSlot(slotId) {
 	const moveInputs = document.querySelectorAll(
 		`[name^="pokemon[${slotId}][moves]"]`,
 	);
+	const abilityInput = document.querySelector(
+		`input[name="pokemon[${slotId}][habilidad]"]`,
+	);
 
 	spriteImg.src = SPRITE_UNKNOWN;
 	spriteImg.style.opacity = '1';
@@ -679,6 +820,9 @@ function resetearSlot(slotId) {
 	delete movimientosPorSlot[slotId];
 	delete statsBasePorSlot[slotId];
 	delete pokemonContextPorSlot[slotId];
+	if (abilityInput) {
+		abilityInput.value = '';
+	}
 
 	moveInputs.forEach((moveInput) => {
 		moveInput.disabled = true;

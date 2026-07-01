@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $m2 = $data['moves'][2] ?? '';
         $m3 = $data['moves'][3] ?? '';
         $m4 = $data['moves'][4] ?? '';
+        $habilidad = trim($data['habilidad'] ?? '');
         $gender = strtoupper($data['gender'] ?? 'N');
         if (!in_array($gender, ['N', 'M', 'F'], true)) {
             $gender = 'N';
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pokemonList[] = [
             'pokemon_name'   => $data['name'],
             'objeto'         => $data['item'] ?? '',
-            'habilidad'      => '',
+            'habilidad'      => $habilidad,
             'naturaleza'     => '',
             'movimiento_1'   => $m1,
             'movimiento_2'   => $m2,

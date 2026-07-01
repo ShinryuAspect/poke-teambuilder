@@ -56,6 +56,7 @@ Muestra los equipos del usuario y permite operar sobre ellos.
 Permite:
 
 - Seleccionar Pokémon mediante autocompletado.
+- Buscar habilidades con autocompletado desplegable y normalización visual.
 - Cargar sprites y tipos automáticamente.
 - Gestionar objetos, movimientos, naturaleza, EVs, IVs, género y shiny.
 - Recalcular stats de forma inmediata.
@@ -69,6 +70,8 @@ Los equipos guardados se pueden recuperar y modificar desde una interfaz equival
 Existe una base para el análisis competitivo asistido por Gemini, pensada para ampliar la funcionalidad táctica del proyecto.
 
 ## 6. Capturas de pantalla
+
+Las siguientes capturas reales se han incrustado como evidencia del flujo completo de la aplicación en su estado actual.
 
 ### Login
 
@@ -100,6 +103,18 @@ Existe una base para el análisis competitivo asistido por Gemini, pensada para 
 
 ![Resultado de análisis táctico](screenshots/captura-analisis.png)
 
+### Secuencia de uso
+
+1. [Login](screenshots/captura-login.png)
+2. [Registro](screenshots/captura-registro.png)
+3. [Dashboard vacío](screenshots/captura-dashboard_empty.png)
+4. [Dashboard con equipos](screenshots/captura-dashboard.png)
+5. [Constructor vacío](screenshots/captura-builder_empty.png)
+6. [Constructor con equipo](screenshots/captura-builder.png)
+7. [Editor sin modificar](screenshots/captura-editor_unmodified.png)
+8. [Editor con cambios](screenshots/captura-editor.png)
+9. [Análisis táctico](screenshots/captura-analisis.png)
+
 ## 7. Problemas encontrados y soluciones
 
 ### Problema 1: Integración de datos dinámicos de sprites y género
@@ -118,6 +133,10 @@ Existe una base para el análisis competitivo asistido por Gemini, pensada para 
 
 **Solución:** se dejó preparada la arquitectura de servicios y el endpoint de análisis para una integración completa con Gemini.
 
+### Problema 5: Portabilidad de equipos entre herramientas externas
+
+**Solución:** se documentó como vía futura la exportación e importación interoperable de equipos y Pokémon para mantener compatibilidad con Pokémon Showdown y otras webs alternativas.
+
 ## 8. Futuras vías de desarrollo
 
 Aunque el proyecto ya cumple su objetivo principal, se pueden plantear varias mejoras para una evolución posterior:
@@ -127,7 +146,7 @@ Aunque el proyecto ya cumple su objetivo principal, se pueden plantear varias me
 - Añadir más formatos de equipo o reglas competitivas si se desea ampliar el alcance de la aplicación.
 - Mejorar el sistema de análisis con métricas más profundas sobre cobertura, amenazas y sinergias del equipo.
 - Incorporar persistencia más avanzada para campos competitivos adicionales como habilidad, EV spread o IV spread si se desea exportar el equipo con mayor fidelidad.
-- Añadir exportación e importación de equipos y Pokémon en formatos compatibles con herramientas externas, como Pokémon Showdown o web alternativas similares, para facilitar la portabilidad de estrategias.
+- Añadir exportación e importación de equipos y Pokémon en formatos compatibles con herramientas externas, como Pokémon Showdown o webs alternativas similares, para facilitar la portabilidad de estrategias.
 - Refactorizar el servicio de búsqueda competitiva para eliminar nombres heredados y dejar la nomenclatura completamente alineada con PokéAPI.
 
 ## 9. Conclusiones

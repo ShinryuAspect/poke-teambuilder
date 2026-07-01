@@ -28,6 +28,7 @@ Este proyecto ha sido desarrollado como trabajo final para el curso de especiali
 - **Team Builder Dinámico:** Creación, edición, lectura y borrado (CRUD) de combinaciones de hasta 6 Pokémon por equipo.
     - Carga automática de sprites oficiales según especie, sexo y variación shiny cuando la especie lo permite.
     - Bloqueo inteligente del selector de género en especies sin género o con género único.
+    - Autocompletado desplegable de Pokémon, objetos, movimientos y habilidades con normalización visual del texto.
     - Recalculo inmediato de stats al seleccionar un Pokémon, sin depender de modificar naturaleza, EVs o IVs manualmente.
 
 ---
@@ -86,6 +87,11 @@ define('GEMINI_API_KEY', 'TU_API_KEY_AQUI');
 - [x] **Entregable 2:** Diseño Conceptual, Modelo Entidad-Relación y Script DDL.
 - [ ] **Entregable 3:** Desarrollo del Sistema de Autenticación, persistencia base y pruebas de interconexión con APIs.
 - [ ] **Entregable 4:** Maquetación del Frontend, implementación de caché de traducción, memoria final y presentación.
+
+## 📦 Compatibilidad y Evolución
+
+- El proyecto deja documentada como vía de evolución la exportación e importación interoperable de equipos y Pokémon para compatibilidad con Pokémon Showdown y otras herramientas externas.
+- La memoria final incluye capturas reales del flujo principal para facilitar la defensa y la demostración del producto.
 
 ---
 

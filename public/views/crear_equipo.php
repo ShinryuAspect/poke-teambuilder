@@ -62,6 +62,12 @@ require_once 'header.php';
                             <div class="sugerencias-dropdown"></div>
                         </div>
 
+                        <div class="form-group relative">
+                            <label>Habilidad</label>
+                            <input type="text" name="pokemon[<?= $i ?>][habilidad]" class="input-ability" placeholder="Ej: Adaptability" autocomplete="off">
+                            <div class="sugerencias-dropdown"></div>
+                        </div>
+
                         <div class="moves-group">
                             <label>Movimientos (Moveset)</label>
                             <?php for ($m = 1; $m <= 4; $m++): ?>

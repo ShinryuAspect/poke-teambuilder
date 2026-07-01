@@ -61,6 +61,7 @@ require_once 'header.php';
                 $pkmnItem = $hasPokemon ? htmlspecialchars($pkmn['objeto'] ?? '') : '';
                 $pkmnGender = $hasPokemon ? strtoupper((string)($pkmn['gender'] ?? 'N')) : 'N';
                 $pkmnShiny = $hasPokemon && !empty($pkmn['shiny']);
+                $pkmnAbility = $hasPokemon ? htmlspecialchars(ucwords(str_replace('-', ' ', (string)($pkmn['habilidad'] ?? '')))) : '';
                 
                 $spriteSrc = BASE_URL . "public/assets/img/unknown.png";
             ?>
@@ -88,6 +89,13 @@ require_once 'header.php';
                             <label>Objeto</label>
                             <input type="text" name="pokemon[<?= $i ?>][item]" class="input-item" 
                                    placeholder="Ninguno" autocomplete="off" value="<?= $pkmnItem ?>">
+                            <div class="sugerencias-dropdown"></div>
+                        </div>
+
+                        <div class="form-group relative">
+                            <label>Habilidad</label>
+                            <input type="text" name="pokemon[<?= $i ?>][habilidad]" class="input-ability" 
+                                   placeholder="Ej: Adaptability" autocomplete="off" value="<?= $pkmnAbility ?>">
                             <div class="sugerencias-dropdown"></div>
                         </div>
 
