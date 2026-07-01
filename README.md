@@ -1,6 +1,6 @@
 # 🚀 Pokémon Team Builder & Live AI Translator
 
-Un creador de equipos competitivos de Pokémon desarrollado en **PHP 8 (POO)** y **MySQL**, integrado con la API de Smogon para la extracción de métricas y sets de movimientos, combinando el potencial de la Inteligencia Artificial mediante la **API de Google Gemini** para ofrecer traducción y adaptación técnica en vivo al castellano.
+Un creador de equipos competitivos de Pokémon desarrollado en **PHP 8 (POO)** y **MySQL**, integrado con **PokéAPI** para la extracción de especies, sprites, tipos y movimientos, combinando el potencial de la Inteligencia Artificial mediante la **API de Google Gemini** para ofrecer traducción y adaptación técnica en vivo al castellano.
 
 Este proyecto ha sido desarrollado como trabajo final para el curso de especialización profesional en Desarrollo Web.
 
@@ -12,7 +12,7 @@ Este proyecto ha sido desarrollado como trabajo final para el curso de especiali
 - **Base de Datos:** MySQL / MariaDB (Motor InnoDB, Restricciones de integridad referencial y borrado en cascada).
 - **Frontend:** HTML5 semántico, CSS3 moderno (Flexbox & Grid Layout) y JavaScript nativo (Vanilla JS) mediante consumo asíncrono con **Fetch API**.
 - **APIs Externas Integradas:**
-    - Smogon API - Repositorio de datos competitivos y estrategias.
+    - PokéAPI - Repositorio de datos de especies, sprites, tipos, movimientos y objetos.
     - Google Gemini API (1.5 Flash) - Traducción contextual, interpretación y adaptación de la terminología técnica del metajuego.
 
 ---
@@ -41,7 +41,7 @@ poke-teambuilder/
 ├── config/              # Parámetros globales y conexión PDO (Singleton)
 ├── src/                 # Núcleo del Backend (POO)
 │   ├── Models/          # Entidades de Base de Datos (Usuario, Equipo, Pokemon)
-│   └── Services/        # Capa de servicios externos (GeminiService, SmogonAPI)
+│   └── Services/        # Capa de servicios externos (GeminiService, búsqueda PokéAPI)
 ├── public/              # Directorio raíz del servidor web público
 │   ├── api/             # Endpoints asíncronos que devuelven JSON
 │   ├── assets/          # Recursos estáticos (CSS, JS, imágenes locales)

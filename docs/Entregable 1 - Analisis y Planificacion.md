@@ -2,7 +2,7 @@
 
 ## 1. Descripción del proyecto
 
-**Pokémon Team Builder & Live AI Translator** es una aplicación web desarrollada en **PHP 8**, **MySQL/MariaDB**, **HTML5**, **CSS3** y **JavaScript** que permite crear y gestionar equipos competitivos de Pokémon con una interfaz dinámica inspirada en herramientas de teambuilding competitivo. El sistema consulta servicios externos para enriquecer la experiencia de usuario, especialmente la **PokéAPI** para datos de especies, sprites y movimientos, la **Smogon API** para búsquedas competitivas y la **API de Google Gemini** para análisis/traducción táctica.
+**Pokémon Team Builder & Live AI Translator** es una aplicación web desarrollada en **PHP 8**, **MySQL/MariaDB**, **HTML5**, **CSS3** y **JavaScript** que permite crear y gestionar equipos competitivos de Pokémon con una interfaz dinámica inspirada en herramientas de teambuilding competitivo. El sistema consulta servicios externos para enriquecer la experiencia de usuario, especialmente la **PokéAPI** para datos de especies, sprites, movimientos y búsqueda competitiva, y la **API de Google Gemini** para análisis/traducción táctica.
 
 El proyecto combina autenticación, persistencia en base de datos, gestión de equipos, validación de formularios y consumo de APIs externas en una solución web completa orientada a la práctica de los contenidos del curso.
 
@@ -50,7 +50,7 @@ Desarrollar una aplicación web funcional para construir, editar, analizar y alm
 - **Base de datos:** MySQL / MariaDB
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Persistencia:** PDO
-- **APIs externas:** PokéAPI, Smogon API, Google Gemini API
+- **APIs externas:** PokéAPI, Google Gemini API
 - **Patrón de trabajo:** separación de responsabilidades entre vistas, modelos y servicios
 
 ## 6. Casos de uso
@@ -122,7 +122,7 @@ Desarrollar una aplicación web funcional para construir, editar, analizar y alm
 
 - Integración de APIs externas: **Cumplido**
 - PokéAPI para Pokémon, sprites y especies: **Cumplido**
-- Smogon API / servicio de búsqueda competitiva: **Cumplido**
+- PokéAPI / servicio de búsqueda competitiva: **Cumplido**
 - Google Gemini API para análisis/traducción: **Parcialmente integrado y documentado**, con el servicio preparado en la arquitectura del proyecto
 
 ### Seguridad

@@ -29,7 +29,7 @@ Desarrollar una solución web completa para la gestión de equipos competitivos 
 - **JavaScript**
 - **PDO** para acceso a base de datos
 - **PokéAPI** para datos de especies, sprites y movimientos
-- **Smogon API** para búsqueda competitiva
+- **PokéAPI** para búsqueda competitiva y autocompletado de especies
 - **Google Gemini API** para análisis y traducción asistida
 
 ## 4. Diseño de la base de datos
@@ -70,29 +70,35 @@ Existe una base para el análisis competitivo asistido por Gemini, pensada para 
 
 ## 6. Capturas de pantalla
 
-Se recomienda incluir en esta sección capturas reales del proyecto ejecutándose en local:
+### Login
 
-- Pantalla de login.
-- Pantalla de registro.
-- Dashboard de equipos.
-- Constructor de equipos.
-- Editor de equipos.
-- Resultado de análisis táctico.
+![Pantalla de login](screenshots/captura-login.png)
 
-### Ruta sugerida para las imágenes
+### Registro
 
-Si se desea mantener el proyecto ordenado, se pueden guardar las capturas en:
+![Pantalla de registro](screenshots/captura-registro.png)
 
-- `docs/capturas/`
+### Dashboard
 
-### Lista de capturas a incluir
+![Dashboard de equipos vacío](screenshots/captura-dashboard_empty.png)
 
-- `captura-login.png`
-- `captura-registro.png`
-- `captura-dashboard.png`
-- `captura-builder.png`
-- `captura-editor.png`
-- `captura-analisis.png`
+![Dashboard de equipos](screenshots/captura-dashboard.png)
+
+### Constructor de equipos
+
+![Constructor de equipos vacío](screenshots/captura-builder_empty.png)
+
+![Constructor de equipos](screenshots/captura-builder.png)
+
+### Editor de equipos
+
+![Editor de equipos sin modificar](screenshots/captura-editor_unmodified.png)
+
+![Editor de equipos](screenshots/captura-editor.png)
+
+### Análisis táctico
+
+![Resultado de análisis táctico](screenshots/captura-analisis.png)
 
 ## 7. Problemas encontrados y soluciones
 
@@ -112,13 +118,25 @@ Si se desea mantener el proyecto ordenado, se pueden guardar las capturas en:
 
 **Solución:** se dejó preparada la arquitectura de servicios y el endpoint de análisis para una integración completa con Gemini.
 
-## 8. Conclusiones
+## 8. Futuras vías de desarrollo
+
+Aunque el proyecto ya cumple su objetivo principal, se pueden plantear varias mejoras para una evolución posterior:
+
+- Integrar de forma completa el servicio de análisis con Gemini, sustituyendo la respuesta simulada por una salida real generada desde la API.
+- Mover las claves sensibles de configuración a variables de entorno para reforzar la seguridad del despliegue.
+- Añadir más formatos de equipo o reglas competitivas si se desea ampliar el alcance de la aplicación.
+- Mejorar el sistema de análisis con métricas más profundas sobre cobertura, amenazas y sinergias del equipo.
+- Incorporar persistencia más avanzada para campos competitivos adicionales como habilidad, EV spread o IV spread si se desea exportar el equipo con mayor fidelidad.
+- Añadir exportación e importación de equipos y Pokémon en formatos compatibles con herramientas externas, como Pokémon Showdown o web alternativas similares, para facilitar la portabilidad de estrategias.
+- Refactorizar el servicio de búsqueda competitiva para eliminar nombres heredados y dejar la nomenclatura completamente alineada con PokéAPI.
+
+## 9. Conclusiones
 
 El proyecto cumple con los objetivos académicos propuestos porque integra frontend dinámico, backend en PHP 8, persistencia en MySQL/MariaDB, seguridad básica, validación y consumo de APIs externas. Además, la solución está estructurada de manera modular, lo que facilita su mantenimiento y evolución.
 
 Como trabajo final, demuestra la capacidad de construir una aplicación web completa con lógica de negocio real, interacción con servicios externos y almacenamiento persistente de datos.
 
-## 9. Sugerencias para la presentación
+## 10. Sugerencias para la presentación
 
 1. Explicar primero el problema que resuelve la aplicación.
 2. Mostrar el modelo de datos y justificar la estructura elegida.

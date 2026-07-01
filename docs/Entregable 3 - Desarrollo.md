@@ -69,9 +69,9 @@ Se usa para:
 - Tipos, estadísticas base y movimientos por especie.
 - Información de género y diferencias entre macho/hembra cuando existen.
 
-### Smogon / búsqueda competitiva
+### Búsqueda competitiva basada en PokéAPI
 
-Se emplea un servicio de consulta de especies para reforzar la experiencia de búsqueda competitiva.
+Se emplea un servicio de consulta de especies basado en **PokéAPI** para reforzar la experiencia de búsqueda competitiva. El nombre del servicio conserva una denominación heredada relacionada con Smogon, pero la fuente real de datos ya no es Smogon.
 
 ### Google Gemini
 
@@ -100,6 +100,7 @@ Se revisó la sintaxis PHP de los archivos clave con `php -l` sin errores.
 ## 6. Resultado del desarrollo
 
 El proyecto ya dispone de una base funcional sólida para cumplir el objetivo académico del curso: autenticación, persistencia, CRUD de equipos, teambuilder dinámico y consumo de servicios externos. La integración completa de IA queda planteada como extensión directa de la arquitectura actual.
+El proyecto ya dispone de una base funcional sólida para cumplir el objetivo académico del curso: autenticación, persistencia, CRUD de equipos, teambuilder dinámico y consumo de servicios externos. La integración completa de IA queda planteada como extensión directa de la arquitectura actual, y la búsqueda competitiva ya está resuelta sobre PokéAPI.
 
 ## 7. Observaciones técnicas
 

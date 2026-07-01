@@ -58,10 +58,9 @@ El modelo se compone de cuatro entidades principales diseñadas bajo las reglas 
 
 - A. Gestión de Usuarios y Roles (`USUARIOS`)
   Propósito: Almacena las credenciales de acceso y determina los privilegios dentro de la aplicación web.
+    - Seguridad: El campo `password_hash` se define con una longitud amplia para alojar los hashes generados mediante el algoritmo nativo de PHP 8 `password_hash()` (como Bcrypt o Argon2id), impidiendo el almacenamiento de claves en texto plano.
 
-          - Seguridad: El campo `password_hash` se define con una longitud amplia para alojar los hashes generados mediante el algoritmo nativo de PHP 8 `password_hash()` (como Bcrypt o Argon2id), impidiendo el almacenamiento de claves en texto plano.
-
-          - Control de Accesos: El atributo `rol` actúa como un enumerado práctico (`user`, `admin`). Permite que el backend restrinja rutas específicas para funciones administrativas (como auditoría del sistema o métricas globales).
+    - Control de Accesos: El atributo `rol` actúa como un enumerado práctico (`user`, `admin`). Permite que el backend restrinja rutas específicas para funciones administrativas (como auditoría del sistema o métricas globales).
 
 - B. Estructura de Equipos (`EQUIPOS`)
     - Relación: Posee una relación 1 a Muchos (1:N) con la tabla `USUARIOS`. Un usuario puede diseñar múltiples configuraciones de equipos, pero cada equipo pertenece en exclusiva a su creador.
@@ -71,7 +70,7 @@ El modelo se compone de cuatro entidades principales diseñadas bajo las reglas 
 - C. Configuración Técnica de Criaturas (`POKEMON`)
     - Relación: Mantiene una relación 1 a Muchos (1:N) con la tabla `EQUIPOS`. Cada equipo aloja un subconjunto de hasta 6 registros de Pokémon totalmente personalizados.
 
-    - Decisión de Diseño (Optimización): En lugar de crear complejas tablas maestras e intermedias para los miles de movimientos, objetos y habilidades existentes en el juego, se optó por almacenar estos campos como cadenas de texto (`VARCHAR`). Dado que los datos ya vienen previamente validados y estructurados desde la API oficial de Smogon en el frontend, esta arquitectura evita un exceso innecesario de uniones (`JOINs`), acelerando drásticamente la velocidad de carga de un equipo completo.
+    - Decisión de Diseño (Optimización): En lugar de crear complejas tablas maestras e intermedias para los miles de movimientos, objetos y habilidades existentes en el juego, se optó por almacenar estos campos como cadenas de texto (`VARCHAR`). Dado que los datos ya vienen previamente validados y estructurados desde la API oficial de PokéAPI en el frontend, esta arquitectura evita un exceso innecesario de uniones (`JOINs`), acelerando drásticamente la velocidad de carga de un equipo completo.
 
     - Presentación Dinámica: El frontend consulta la PokéAPI para resolver sprites, variaciones shiny y diferencias por género. Cuando una especie no admite género o tiene un género fijo, el selector se bloquea automáticamente para evitar estados inválidos.
 
@@ -80,7 +79,7 @@ El modelo se compone de cuatro entidades principales diseñadas bajo las reglas 
 - D. Capa de Rendimiento y Ahorro de API (`TRADUCCIONES_CACHE`)
     - Propósito: Funciona de forma aislada al flujo principal como una capa de caché local.
 
-    - Funcionamiento: Las peticiones de traducción de análisis competitivos con la IA de Gemini tienen un costo de tiempo de respuesta (latencia) y límites de cuota diarios. Cuando la aplicación solicita traducir un análisis de Smogon, el backend calcula un hash identificador único (MD5/SHA1) del texto original en inglés.
+    - Funcionamiento: Las peticiones de traducción de análisis competitivos con la IA de Gemini tienen un costo de tiempo de respuesta (latencia) y límites de cuota diarios. Cuando la aplicación solicita traducir un análisis competitivo, el backend calcula un hash identificador único (MD5/SHA1) del texto original en inglés.
 
     - Flujo:
         1. Si el hash ya existe en `TRADUCCIONES_CACHE`, PHP sirve instantáneamente el texto en español desde la base de datos local en milisegundos.

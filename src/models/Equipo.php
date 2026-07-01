@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../config/database.php';
 class Equipo {
     private PDO $db;
     private ?array $pokemonColumns = null;
+    private ?array $equipoColumns = null;
 
     public function __construct() {
         $this->db = Database::conectar();
@@ -38,6 +39,17 @@ class Equipo {
         $this->pokemonColumns = array_map(static fn(array $columna) => $columna['Field'], $stmt->fetchAll());
 
         return $this->pokemonColumns;
+    }
+
+    private function obtenerColumnasEquipo(): array {
+        if ($this->equipoColumns !== null) {
+            return $this->equipoColumns;
+        }
+
+        $stmt = $this->db->query("SHOW COLUMNS FROM equipos");
+        $this->equipoColumns = array_map(static fn(array $columna) => $columna['Field'], $stmt->fetchAll());
+
+        return $this->equipoColumns;
     }
 
     private function prepararDatosPokemon(array $pkmn): array {
@@ -75,9 +87,16 @@ class Equipo {
         try {
             $this->db->beginTransaction();
 
-            $sqlEquipo = "INSERT INTO equipos (id_usuario, nombre_equipo, formato_tier) VALUES (?, ?, ?)";
-            $stmtEquipo = $this->db->prepare($sqlEquipo);
-            $stmtEquipo->execute([$idUsuario, $nombreEquipo, '']);
+            $columnasEquipo = $this->obtenerColumnasEquipo();
+            if (in_array('formato_tier', $columnasEquipo, true)) {
+                $sqlEquipo = "INSERT INTO equipos (id_usuario, nombre_equipo, formato_tier) VALUES (?, ?, ?)";
+                $stmtEquipo = $this->db->prepare($sqlEquipo);
+                $stmtEquipo->execute([$idUsuario, $nombreEquipo, '']);
+            } else {
+                $sqlEquipo = "INSERT INTO equipos (id_usuario, nombre_equipo) VALUES (?, ?)";
+                $stmtEquipo = $this->db->prepare($sqlEquipo);
+                $stmtEquipo->execute([$idUsuario, $nombreEquipo]);
+            }
             
             $idEquipo = $this->db->lastInsertId();
 
@@ -115,9 +134,16 @@ class Equipo {
         try {
             $this->db->beginTransaction();
 
-            $sqlActualizarEquipo = "UPDATE equipos SET nombre_equipo = ?, formato_tier = ? WHERE id = ? AND id_usuario = ?";
-            $stmtEquipo = $this->db->prepare($sqlActualizarEquipo);
-            $stmtEquipo->execute([$nombreEquipo, '', $idEquipo, $idUsuario]);
+            $columnasEquipo = $this->obtenerColumnasEquipo();
+            if (in_array('formato_tier', $columnasEquipo, true)) {
+                $sqlActualizarEquipo = "UPDATE equipos SET nombre_equipo = ?, formato_tier = ? WHERE id = ? AND id_usuario = ?";
+                $stmtEquipo = $this->db->prepare($sqlActualizarEquipo);
+                $stmtEquipo->execute([$nombreEquipo, '', $idEquipo, $idUsuario]);
+            } else {
+                $sqlActualizarEquipo = "UPDATE equipos SET nombre_equipo = ? WHERE id = ? AND id_usuario = ?";
+                $stmtEquipo = $this->db->prepare($sqlActualizarEquipo);
+                $stmtEquipo->execute([$nombreEquipo, $idEquipo, $idUsuario]);
+            }
 
             $sqlBorrarViejos = "DELETE FROM pokemon WHERE id_equipo = ?";
             $stmtBorrar = $this->db->prepare($sqlBorrarViejos);
