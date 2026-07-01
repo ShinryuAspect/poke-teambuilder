@@ -20,7 +20,7 @@ if (!defined('DB_NAME')) {
 }
 
 if (!defined('GEMINI_API_KEY')) {
-    define('GEMINI_API_KEY', 'AIzaSyDYSeMjHf6y0MZdhALTp8MtpjJlewWAngU');
+    define('GEMINI_API_KEY', 'API KEY');
 }
 
 if (!defined('BASE_URL')) {
