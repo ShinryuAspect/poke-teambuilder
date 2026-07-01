@@ -1,250 +1,735 @@
 const DB_NAME = 'PokeAppCacheDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'pokemon_lists';
+const STORE_ITEMS = 'item_lists';
 let db;
 
+const movimientosPorSlot = {};
+const statsBasePorSlot = {};
+const pokemonContextPorSlot = {};
+const SPRITE_UNKNOWN = '../assets/img/unknown.png';
+const POKEAPI_VERSION_GROUP = 'scarlet-violet';
+
+const NATURALEZAS = {
+	Adamant: { plus: 'atk', minus: 'spa', name: 'Firme (Adamant)' },
+	Bashful: { plus: null, minus: null, name: 'Tímida (Bashful)' },
+	Bold: { plus: 'def', minus: 'atk', name: 'Osada (Bold)' },
+	Brave: { plus: 'atk', minus: 'spe', name: 'Audaz (Brave)' },
+	Calm: { plus: 'spd', minus: 'atk', name: 'Serena (Calm)' },
+	Careful: { plus: 'spd', minus: 'spa', name: 'Cauta (Careful)' },
+	Docile: { plus: null, minus: null, name: 'Dócil (Docile)' },
+	Gentle: { plus: 'spd', minus: 'def', name: 'Amable (Gentle)' },
+	Hardy: { plus: null, minus: null, name: 'Activa (Hardy)' },
+	Hasty: { plus: 'spe', minus: 'def', name: 'Activa (Hasty)' },
+	Impish: { plus: 'def', minus: 'spa', name: 'Agitada (Impish)' },
+	Jolly: { plus: 'spe', minus: 'spa', name: 'Alegre (Jolly)' },
+	Lax: { plus: 'def', minus: 'spd', name: 'Floja (Lax)' },
+	Lonely: { plus: 'atk', minus: 'def', name: 'Huraña (Lonely)' },
+	Mild: { plus: 'spa', minus: 'def', name: 'Afable (Mild)' },
+	Modest: { plus: 'spa', minus: 'atk', name: 'Modesta (Modest)' },
+	Naive: { plus: 'spe', minus: 'spd', name: 'Ingenua (Naive)' },
+	Naughty: { plus: 'atk', minus: 'spd', name: 'Pícara (Naughty)' },
+	Quiet: { plus: 'spa', minus: 'spe', name: 'Mansa (Quiet)' },
+	Quirky: { plus: null, minus: null, name: 'Rara (Quirky)' },
+	Rash: { plus: 'spa', minus: 'spd', name: 'Alocada (Rash)' },
+	Relaxed: { plus: 'def', minus: 'spe', name: 'Plácida (Relaxed)' },
+	Sassy: { plus: 'spd', minus: 'spe', name: 'Grosera (Sassy)' },
+	Serious: { plus: null, minus: null, name: 'Seria (Serious)' },
+	Timid: { plus: 'spe', minus: 'atk', name: 'Miedosa (Timid)' },
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        db = await inicializarDB();
-        await inicializarCachePokemon();
-    } catch (err) {
-        console.error("Error al preparar la base de datos de caché:", err);
-    }
+	window.addEventListener(
+		'keydown',
+		(e) => {
+			if (e.key === 'Escape') {
+				e.preventDefault();
+				e.stopPropagation();
+				document
+					.querySelectorAll('.sugerencias-dropdown')
+					.forEach((dropdown) => {
+						dropdown.innerHTML = '';
+					});
+				if (
+					document.activeElement &&
+					(document.activeElement.tagName === 'INPUT' ||
+						document.activeElement.tagName === 'SELECT')
+				) {
+					if (document.activeElement.value === 'null') {
+						document.activeElement.value = '';
+					}
+					document.activeElement.blur();
+				}
+			}
+		},
+		true,
+	);
 
-    const pokemonInputs = document.querySelectorAll('.input-pokemon');
+	try {
+		db = await inicializarDB();
+		await inicializarCachePokemon();
+		await inicializarCacheObjetos();
+	} catch (err) {
+		console.error('Error al preparar la base de datos de caché:', err);
+	}
 
-    pokemonInputs.forEach(input => {
-        const card = input.closest('.pokemon-card');
-        const slotId = card.dataset.slot;
-        const dropdown = input.nextElementSibling;
+	const pokemonInputs = document.querySelectorAll('.input-pokemon');
+	pokemonInputs.forEach((input) => {
+		const card = input.closest('.pokemon-card');
+		const slotId = card.dataset.slot;
+		const dropdown = input.nextElementSibling;
 
-        input.addEventListener('input', async (e) => {
-            const query = e.target.value.trim().toLowerCase();
+		input.addEventListener('keyup', (e) => {
+			if (input.value === 'null') input.value = '';
+		});
 
-            if (query.length === 0) {
-                dropdown.innerHTML = '';
-                resetearSlot(slotId);
-                return;
-            }
+		input.addEventListener('input', async () => {
+			const query = input.value.trim().toLowerCase();
+			if (query.length === 0) {
+				dropdown.innerHTML = '';
+				resetearSlot(slotId);
+				return;
+			}
+			if (query.length < 2) {
+				dropdown.innerHTML = '';
+				return;
+			}
+			const pokeCache = await obtenerPokemonDeDB();
+			const filtrados = pokeCache
+				.filter((p) => p.includes(query))
+				.slice(0, 5);
+			renderSugerencias(filtrados, input, dropdown, slotId);
+		});
 
-            if (query.length < 2) {
-                dropdown.innerHTML = '';
-                return;
-            }
+		input.addEventListener('focus', async () => {
+			const query = input.value.trim().toLowerCase();
+			if (query.length >= 2) {
+				const pokeCache = await obtenerPokemonDeDB();
+				const filtrados = pokeCache
+					.filter((p) => p.includes(query))
+					.slice(0, 5);
+				renderSugerencias(filtrados, input, dropdown, slotId);
+			}
+		});
 
-            const pokeCache = await obtenerPokemonDeDB();
-            const filtrados = pokeCache
-                .filter(p => p.includes(query))
-                .slice(0, 5);
+		if (input.value.trim().length > 0) {
+			cargarDatosPokemon(input.value.trim(), slotId);
+		}
+	});
 
-            renderSugerencias(filtrados, input, dropdown, slotId);
-        });
+	const itemInputs = document.querySelectorAll('.input-item');
+	itemInputs.forEach((input) => {
+		const dropdown = input.nextElementSibling;
 
-        input.addEventListener('focus', async () => {
-            const query = input.value.trim().toLowerCase();
-            if (query.length >= 2) {
-                const pokeCache = await obtenerPokemonDeDB();
-                const filtrados = pokeCache.filter(p => p.includes(query)).slice(0, 5);
-                renderSugerencias(filtrados, input, dropdown, slotId);
-            }
-        });
+		input.addEventListener('input', async (e) => {
+			const query = e.target.value.trim().toLowerCase();
+			if (query.length < 1) {
+				dropdown.innerHTML = '';
+				return;
+			}
 
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.innerHTML = '';
-            }
-        });
-    });
+			const objetosCache = await obtenerObjetosDeDB();
+			const filtrados = objetosCache
+				.filter((item) => item.includes(query))
+				.slice(0, 5);
+			renderSugerenciasObjetos(filtrados, input, dropdown);
+		});
+
+		input.addEventListener('focus', async () => {
+			const query = input.value.trim().toLowerCase();
+			if (query.length >= 1) {
+				const objetosCache = await obtenerObjetosDeDB();
+				const filtrados = objetosCache
+					.filter((item) => item.includes(query))
+					.slice(0, 5);
+				renderSugerenciasObjetos(filtrados, input, dropdown);
+			}
+		});
+	});
+
+	const moveInputs = document.querySelectorAll('.input-move');
+	moveInputs.forEach((input) => {
+		const card = input.closest('.pokemon-card');
+		const slotId = card.dataset.slot;
+		const dropdown = input.nextElementSibling;
+
+		input.addEventListener('input', () => {
+			const query = input.value.trim().toLowerCase();
+			const movimientosLegales = movimientosPorSlot[slotId] || [];
+
+			if (query.length < 1) {
+				dropdown.innerHTML = '';
+				return;
+			}
+			const filtrados = movimientosLegales
+				.filter((move) => move.includes(query))
+				.slice(0, 5);
+			renderSugerenciasMovimientos(filtrados, input, dropdown);
+		});
+
+		input.addEventListener('focus', () => {
+			const query = input.value.trim().toLowerCase();
+			const movimientosLegales = movimientosPorSlot[slotId] || [];
+			const filtrados = movimientosLegales
+				.filter((move) => move.includes(query))
+				.slice(0, 5);
+			if (filtrados.length > 0) {
+				renderSugerenciasMovimientos(filtrados, input, dropdown);
+			}
+		});
+	});
+
+	document.addEventListener('input', (e) => {
+		if (
+			e.target.classList.contains('input-ev') ||
+			e.target.classList.contains('input-iv')
+		) {
+			const slotId = e.target.dataset.slot;
+			calcularStatsDelSlot(slotId);
+		}
+	});
+
+	document.addEventListener('change', (e) => {
+		if (e.target.classList.contains('select-nature')) {
+			const slotId = e.target.dataset.slot;
+			calcularStatsDelSlot(slotId);
+			return;
+		}
+
+		if (
+			e.target.matches(`select[name^="pokemon"][name$="[gender]"]`) ||
+			e.target.matches(`input[name^="pokemon"][name$="[shiny]"]`)
+		) {
+			const card = e.target.closest('.pokemon-card');
+			if (card) {
+				actualizarSpriteDelSlot(card.dataset.slot);
+			}
+		}
+	});
+
+	document.addEventListener('click', (e) => {
+		document
+			.querySelectorAll('.sugerencias-dropdown')
+			.forEach((dropdown) => {
+				const inputAsociado = dropdown.previousElementSibling;
+				if (
+					inputAsociado &&
+					!inputAsociado.contains(e.target) &&
+					!dropdown.contains(e.target)
+				) {
+					dropdown.innerHTML = '';
+				}
+			});
+	});
 });
 
 function inicializarDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onupgradeneeded = (e) => {
-            const database = e.target.result;
-            if (!database.objectStoreNames.contains(STORE_NAME)) {
-                database.createObjectStore(STORE_NAME);
-            }
-        };
-
-        request.onsuccess = (e) => resolve(e.target.result);
-        request.onerror = (e) => reject(e.target.error);
-    });
+	return new Promise((resolve, reject) => {
+		const request = indexedDB.open(DB_NAME, DB_VERSION);
+		request.onupgradeneeded = (e) => {
+			const database = e.target.result;
+			if (!database.objectStoreNames.contains(STORE_NAME)) {
+				database.createObjectStore(STORE_NAME);
+			}
+			if (!database.objectStoreNames.contains(STORE_ITEMS)) {
+				database.createObjectStore(STORE_ITEMS);
+			}
+		};
+		request.onsuccess = (e) => resolve(e.target.result);
+		request.onerror = (e) => reject(e.target.error);
+	});
 }
 
 async function inicializarCachePokemon() {
-    const cachedData = await obtenerPokemonDeDB();
+	const cachedData = await obtenerPokemonDeDB();
+	if (cachedData && cachedData.length > 0) return;
 
-    if (cachedData && cachedData.length > 0) {
-        console.log(`📦 [IndexedDB] ${cachedData.length} Pokémon restaurados desde la base de datos local.`);
-        return;
-    }
+	try {
+		const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+		const data = await res.json();
+		const listaNombres = data.results.map((p) => p.name);
 
-    console.log("🌐 [PokeAPI] Descargando catálogo por primera vez...");
-    try {
-        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-        const data = await res.json();
-        const listaNombres = data.results.map(p => p.name);
-
-        await guardarPokemonEnDB(listaNombres);
-        console.log("💾 [IndexedDB] Catálogo guardado con éxito en el almacenamiento local.");
-    } catch (err) {
-        console.error("Error al poblar la base de datos desde la API:", err);
-    }
-}
-
-function guardarPokemonEnDB(lista) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.put(lista, 'lista_maestra');
-
-        request.onsuccess = () => resolve();
-        request.onerror = (e) => reject(e.target.error);
-    });
+		const transaction = db.transaction([STORE_NAME], 'readwrite');
+		transaction.objectStore(STORE_NAME).put(listaNombres, 'lista_maestra');
+	} catch (err) {
+		console.error('Error al poblar IndexedDB con Pokémon:', err);
+	}
 }
 
 function obtenerPokemonDeDB() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.get('lista_maestra');
+	return new Promise((resolve, reject) => {
+		const transaction = db.transaction([STORE_NAME], 'readonly');
+		const store = transaction.objectStore(STORE_NAME);
+		const request = store.get('lista_maestra');
+		request.onsuccess = (e) => resolve(e.target.result || []);
+		request.onerror = (e) => reject(e.target.error);
+	});
+}
 
-        request.onsuccess = (e) => resolve(e.target.result || []);
-        request.onerror = (e) => reject(e.target.error);
-    });
+async function inicializarCacheObjetos() {
+	const cachedData = await obtenerObjetosDeDB();
+	if (cachedData && cachedData.length > 0) return;
+
+	try {
+		const res = await fetch('https://pokeapi.co/api/v2/item?limit=2176');
+		const data = await res.json();
+		const listaObjetos = data.results.map((i) => i.name);
+
+		const transaction = db.transaction([STORE_ITEMS], 'readwrite');
+		transaction.objectStore(STORE_ITEMS).put(listaObjetos, 'lista_objetos');
+	} catch (err) {
+		console.error('Error al poblar IndexedDB con Objetos:', err);
+	}
+}
+
+function obtenerObjetosDeDB() {
+	return new Promise((resolve, reject) => {
+		const transaction = db.transaction([STORE_ITEMS], 'readonly');
+		const store = transaction.objectStore(STORE_ITEMS);
+		const request = store.get('lista_objetos');
+		request.onsuccess = (e) => resolve(e.target.result || []);
+		request.onerror = (e) => reject(e.target.error);
+	});
 }
 
 function renderSugerencias(lista, input, dropdown, slotId) {
-    dropdown.innerHTML = '';
-    
-    if (lista.length === 0) {
-        dropdown.innerHTML = `<div class="sugerencia-item empty">No se encontraron resultados</div>`;
-        return;
-    }
-
-    lista.forEach(pokeName => {
-        const item = document.createElement('div');
-        item.className = 'sugerencia-item';
-        item.textContent = pokeName.charAt(0).toUpperCase() + pokeName.slice(1);
-        
-        item.addEventListener('click', () => {
-            input.value = item.textContent;
-            dropdown.innerHTML = '';
-            cargarDatosPokemon(pokeName, slotId);
-        });
-        dropdown.appendChild(item);
-    });
+	dropdown.innerHTML = '';
+	if (lista.length === 0) {
+		dropdown.innerHTML = `<div class="sugerencia-item empty">No se encontraron resultados</div>`;
+		return;
+	}
+	lista.forEach((pokeName) => {
+		const item = document.createElement('div');
+		item.className = 'sugerencia-item';
+		item.textContent = pokeName.charAt(0).toUpperCase() + pokeName.slice(1);
+		item.addEventListener('click', () => {
+			input.value = item.textContent;
+			dropdown.innerHTML = '';
+			cargarDatosPokemon(pokeName, slotId);
+		});
+		dropdown.appendChild(item);
+	});
 }
 
-async function cargarDatosPokemon(pokeName, slotId) {
-    const spriteImg = document.getElementById(`sprite-${slotId}`);
-    const typesContainer = document.getElementById(`types-${slotId}`);
-    const moveInputs = document.querySelectorAll(`[name^="pokemon[${slotId}][moves]"]`);
+function renderSugerenciasObjetos(lista, input, dropdown) {
+	dropdown.innerHTML = '';
+	if (lista.length === 0) {
+		dropdown.innerHTML = `<div class="sugerencia-item empty">Objeto no válido</div>`;
+		return;
+	}
+	lista.forEach((itemName) => {
+		const item = document.createElement('div');
+		item.className = 'sugerencia-item';
+		item.textContent = itemName.split('-').join(' ').toUpperCase();
+		item.addEventListener('click', () => {
+			input.value = item.textContent;
+			dropdown.innerHTML = '';
+		});
+		dropdown.appendChild(item);
+	});
+}
 
-    try {
-        spriteImg.style.opacity = '0.4';
+function renderSugerenciasMovimientos(lista, input, dropdown) {
+	dropdown.innerHTML = '';
+	lista.forEach((moveName) => {
+		const item = document.createElement('div');
+		item.className = 'sugerencia-item';
+		item.textContent = moveName.split('-').join(' ').toUpperCase();
+		item.addEventListener('click', () => {
+			input.value = item.textContent;
+			dropdown.innerHTML = '';
+		});
+		dropdown.appendChild(item);
+	});
+}
 
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeName.toLowerCase()}`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
+function extraerMovimientosLegales(pokemonMoves) {
+	if (!Array.isArray(pokemonMoves)) {
+		return [];
+	}
 
-        spriteImg.src = data.sprites.front_default || '../assets/img/unknown.png';
-        spriteImg.style.opacity = '1';
+	const movimientos = pokemonMoves
+		.filter(
+			(moveEntry) =>
+				Array.isArray(moveEntry.version_group_details) &&
+				moveEntry.version_group_details.some(
+					(detail) =>
+						detail.version_group?.name === POKEAPI_VERSION_GROUP,
+				),
+		)
+		.map((moveEntry) => moveEntry.move?.name)
+		.filter(Boolean);
 
-        typesContainer.innerHTML = '';
-        data.types.forEach(t => {
-            const badge = document.createElement('span');
-            badge.className = `badge type-${t.type.name}`;
-            badge.textContent = t.type.name;
-            typesContainer.appendChild(badge);
-        });
+	return [...new Set(movimientos)].sort((a, b) => a.localeCompare(b));
+}
 
-        const listaMovimientos = data.moves.map(m => m.move.name);
+async function cargarDatosPokemon(pokemonName, slotId) {
+	if (!pokemonName) return;
 
-        moveInputs.forEach(moveInput => {
-            moveInput.disabled = false;
-            moveInput.value = '';
-            moveInput.placeholder = "- Selecciona un movimiento";
-            configurarAutocompletadoMovimientos(moveInput, listaMovimientos);
-        });
+	const card = document.querySelector(`.pokemon-card[data-slot="${slotId}"]`);
+	if (!card) return;
 
-    } catch (err) {
-        resetearSlot(slotId);
-    }
+	const spriteImg = document.getElementById(`sprite-${slotId}`);
+	const typesContainer = document.getElementById(`types-${slotId}`);
+	const moveInputs = document.querySelectorAll(
+		`[name^="pokemon[${slotId}][moves]"]`,
+	);
+
+	try {
+		const res = await fetch(
+			`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase().trim()}`,
+		);
+		if (!res.ok) throw new Error();
+		const data = await res.json();
+
+		let speciesData = null;
+		if (data.species && data.species.url) {
+			try {
+				const speciesRes = await fetch(data.species.url);
+				if (speciesRes.ok) {
+					speciesData = await speciesRes.json();
+				}
+			} catch (speciesErr) {
+				console.warn(
+					'No se pudo cargar la especie del Pokémon:',
+					speciesErr,
+				);
+			}
+		}
+
+		pokemonContextPorSlot[slotId] = {
+			frontDefault: data.sprites.front_default || SPRITE_UNKNOWN,
+			frontShiny:
+				data.sprites.front_shiny ||
+				data.sprites.front_default ||
+				SPRITE_UNKNOWN,
+			frontFemale:
+				data.sprites.front_female ||
+				data.sprites.front_default ||
+				SPRITE_UNKNOWN,
+			frontShinyFemale:
+				data.sprites.front_shiny_female ||
+				data.sprites.front_shiny ||
+				data.sprites.front_default ||
+				SPRITE_UNKNOWN,
+			genderRate: speciesData ? speciesData.gender_rate : null,
+		};
+
+		aplicarEstadoGeneroYSprite(slotId);
+
+		typesContainer.innerHTML = '';
+		data.types.forEach((t) => {
+			const badge = document.createElement('span');
+			badge.className = `badge type-${t.type.name}`;
+			badge.textContent = t.type.name;
+			typesContainer.appendChild(badge);
+		});
+
+		document.querySelector(
+			`.select-nature[data-slot="${slotId}"]`,
+		).disabled = false;
+
+		const genderSel = document.querySelector(
+			`select[name="pokemon[${slotId}][gender]"]`,
+		);
+		if (genderSel) genderSel.disabled = false;
+
+		const shinyCb = document.querySelector(
+			`input[name="pokemon[${slotId}][shiny]"]`,
+		);
+		if (shinyCb) shinyCb.disabled = false;
+
+		document
+			.querySelectorAll(
+				`.input-ev[data-slot="${slotId}"], .input-iv[data-slot="${slotId}"]`,
+			)
+			.forEach((input) => {
+				input.disabled = false;
+			});
+
+		movimientosPorSlot[slotId] = extraerMovimientosLegales(data.moves);
+
+		moveInputs.forEach((moveInput) => {
+			moveInput.disabled = false;
+			moveInput.placeholder = '- Selecciona un movimiento';
+		});
+
+		statsBasePorSlot[slotId] = {
+			hp: data.stats[0].base_stat,
+			atk: data.stats[1].base_stat,
+			def: data.stats[2].base_stat,
+			spa: data.stats[3].base_stat,
+			spd: data.stats[4].base_stat,
+			spe: data.stats[5].base_stat,
+		};
+
+		Object.keys(statsBasePorSlot[slotId]).forEach((key) => {
+			const baseCell = document.getElementById(`base-${key}-${slotId}`);
+			if (baseCell) baseCell.textContent = statsBasePorSlot[slotId][key];
+		});
+
+		calcularStatsDelSlot(slotId);
+
+		actualizarSpriteDelSlot(slotId);
+	} catch (err) {
+		resetearSlot(slotId);
+	}
+}
+
+function aplicarEstadoGeneroYSprite(slotId) {
+	const context = pokemonContextPorSlot[slotId];
+	const genderSel = document.querySelector(
+		`select[name="pokemon[${slotId}][gender]"]`,
+	);
+	const shinyCb = document.querySelector(
+		`input[name="pokemon[${slotId}][shiny]"]`,
+	);
+	const genderHidden = document.querySelector(
+		`.gender-hidden[data-slot="${slotId}"]`,
+	);
+
+	if (!context) {
+		return;
+	}
+
+	const genderRate = context.genderRate;
+	if (genderSel) {
+		if (genderRate === -1) {
+			genderSel.value = 'N';
+			genderSel.disabled = true;
+			if (genderHidden) {
+				genderHidden.disabled = false;
+				genderHidden.value = 'N';
+			}
+		} else if (genderRate === 0) {
+			genderSel.value = 'M';
+			genderSel.disabled = true;
+			if (genderHidden) {
+				genderHidden.disabled = false;
+				genderHidden.value = 'M';
+			}
+		} else if (genderRate === 8) {
+			genderSel.value = 'F';
+			genderSel.disabled = true;
+			if (genderHidden) {
+				genderHidden.disabled = false;
+				genderHidden.value = 'F';
+			}
+		} else {
+			genderSel.disabled = false;
+			if (!['M', 'F', 'N'].includes(genderSel.value)) {
+				genderSel.value = 'N';
+			}
+			if (genderHidden) {
+				genderHidden.disabled = true;
+				genderHidden.value = genderSel.value;
+			}
+		}
+	}
+
+	if (shinyCb) {
+		shinyCb.disabled = false;
+	}
+}
+
+function actualizarSpriteDelSlot(slotId) {
+	const context = pokemonContextPorSlot[slotId];
+	const spriteImg = document.getElementById(`sprite-${slotId}`);
+	if (!context || !spriteImg) return;
+
+	const genderSel = document.querySelector(
+		`select[name="pokemon[${slotId}][gender]"]`,
+	);
+	const shinyCb = document.querySelector(
+		`input[name="pokemon[${slotId}][shiny]"]`,
+	);
+	const gender = genderSel ? genderSel.value : 'N';
+	const shiny = shinyCb ? shinyCb.checked : false;
+
+	let spriteUrl = context.frontDefault;
+
+	if (shiny) {
+		if (
+			gender === 'F' &&
+			context.frontShinyFemale &&
+			context.frontShinyFemale !== SPRITE_UNKNOWN
+		) {
+			spriteUrl = context.frontShinyFemale;
+		} else if (
+			context.frontShiny &&
+			context.frontShiny !== SPRITE_UNKNOWN
+		) {
+			spriteUrl = context.frontShiny;
+		}
+	} else if (
+		gender === 'F' &&
+		context.frontFemale &&
+		context.frontFemale !== SPRITE_UNKNOWN
+	) {
+		spriteUrl = context.frontFemale;
+	}
+
+	spriteImg.src = spriteUrl || SPRITE_UNKNOWN;
+	spriteImg.style.opacity = '1';
+}
+
+function calcularStatsDelSlot(slotId) {
+	const baseStats = statsBasePorSlot[slotId];
+	if (!baseStats) return;
+
+	const selectNature = document.querySelector(
+		`.select-nature[data-slot="${slotId}"]`,
+	);
+	const naturalezaSeleccionada = selectNature
+		? selectNature.value
+		: 'Serious';
+	const modificadores = NATURALEZAS[naturalezaSeleccionada] || {
+		plus: null,
+		minus: null,
+	};
+
+	let evTotales = 0;
+	const evInputs = document.querySelectorAll(
+		`.input-ev[data-slot="${slotId}"]`,
+	);
+
+	evInputs.forEach((input) => {
+		let val = parseInt(input.value) || 0;
+		if (val < 0) val = 0;
+		if (val > 252) val = 252;
+		input.value = val;
+		evTotales += val;
+	});
+
+	if (evTotales > 512) {
+		let exceso = evTotales - 512;
+		for (let i = evInputs.length - 1; i >= 0; i--) {
+			let val = parseInt(evInputs[i].value) || 0;
+			if (val >= exceso) {
+				evInputs[i].value = val - exceso;
+				exceso = 0;
+				break;
+			} else {
+				exceso -= val;
+				evInputs[i].value = 0;
+			}
+		}
+		evTotales = 512;
+	}
+
+	const txtContador = document.getElementById(`ev-left-${slotId}`);
+	if (txtContador) txtContador.textContent = 512 - evTotales;
+
+	const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
+	keys.forEach((key) => {
+		const base = baseStats[key] || 0;
+		const evInput = document.querySelector(
+			`.input-ev[data-stat="${key}"][data-slot="${slotId}"]`,
+		);
+		const ivInput = document.querySelector(
+			`.input-iv[data-stat="${key}"][data-slot="${slotId}"]`,
+		);
+
+		const ev = evInput ? parseInt(evInput.value) || 0 : 0;
+		let iv = ivInput ? parseInt(ivInput.value) || 31 : 31;
+
+		if (iv < 0) iv = 0;
+		if (iv > 31) iv = 31;
+		if (ivInput) ivInput.value = iv;
+
+		let total = 0;
+
+		if (key === 'hp') {
+			if (base === 1) {
+				total = 1;
+			} else {
+				total = Math.floor(2 * base + iv + Math.floor(ev / 4) + 110);
+			}
+		} else {
+			let calc = Math.floor(2 * base + iv + Math.floor(ev / 4) + 5);
+			let mod = 1.0;
+			if (modificadores.plus === key) mod = 1.1;
+			if (modificadores.minus === key) mod = 0.9;
+			total = Math.floor(calc * mod);
+		}
+
+		const cellTotal = document.getElementById(`total-${key}-${slotId}`);
+		if (cellTotal) {
+			cellTotal.textContent = total;
+			cellTotal.classList.remove('stat-plus', 'stat-minus');
+			if (modificadores.plus === key)
+				cellTotal.classList.add('stat-plus');
+			if (modificadores.minus === key)
+				cellTotal.classList.add('stat-minus');
+		}
+	});
 }
 
 function resetearSlot(slotId) {
-    const spriteImg = document.getElementById(`sprite-${slotId}`);
-    const typesContainer = document.getElementById(`types-${slotId}`);
-    const moveInputs = document.querySelectorAll(`[name^="pokemon[${slotId}][moves]"]`);
+	const spriteImg = document.getElementById(`sprite-${slotId}`);
+	const typesContainer = document.getElementById(`types-${slotId}`);
+	const moveInputs = document.querySelectorAll(
+		`[name^="pokemon[${slotId}][moves]"]`,
+	);
 
-    spriteImg.src = '../assets/img/unknown.png';
-    spriteImg.style.opacity = '1';
-    typesContainer.innerHTML = `<span class="badge type-unknown">???</span>`;
+	spriteImg.src = SPRITE_UNKNOWN;
+	spriteImg.style.opacity = '1';
+	typesContainer.innerHTML = `<span class="badge type-unknown">???</span>`;
 
-    moveInputs.forEach(moveInput => {
-        moveInput.disabled = true;
-        moveInput.value = '';
-        moveInput.placeholder = "- Bloqueado";
-        
-        const nuevoInput = moveInput.cloneNode(true);
-        moveInput.parentNode.replaceChild(nuevoInput, moveInput);
-    });
-}
+	delete movimientosPorSlot[slotId];
+	delete statsBasePorSlot[slotId];
+	delete pokemonContextPorSlot[slotId];
 
-function configurarAutocompletadoMovimientos(input, movimientosLegales) {
-    const dropdown = input.nextElementSibling;
-    const newInput = input.cloneNode(true);
-    input.parentNode.replaceChild(newInput, input);
+	moveInputs.forEach((moveInput) => {
+		moveInput.disabled = true;
+		moveInput.value = '';
+		moveInput.placeholder = '- Bloqueado';
+	});
 
-    newInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        if (query.length < 1) {
-            dropdown.innerHTML = '';
-            return;
-        }
+	document.querySelector(`.select-nature[data-slot="${slotId}"]`).disabled =
+		true;
+	const genderSel = document.querySelector(
+		`select[name="pokemon[${slotId}][gender]"]`,
+	);
+	const genderHidden = document.querySelector(
+		`.gender-hidden[data-slot="${slotId}"]`,
+	);
+	if (genderSel) {
+		genderSel.disabled = true;
+		genderSel.value = 'N';
+	}
+	if (genderHidden) {
+		genderHidden.disabled = false;
+		genderHidden.value = 'N';
+	}
+	const shinyCb = document.querySelector(
+		`input[name="pokemon[${slotId}][shiny]"]`,
+	);
+	if (shinyCb) {
+		shinyCb.disabled = true;
+		shinyCb.checked = false;
+	}
 
-        const filtrados = movimientosLegales
-            .filter(move => move.includes(query))
-            .slice(0, 5);
+	document
+		.querySelectorAll(
+			`.input-ev[data-slot="${slotId}"], .input-iv[data-slot="${slotId}"]`,
+		)
+		.forEach((input) => {
+			input.disabled = true;
+			input.value = input.classList.contains('input-ev') ? '0' : '31';
+		});
 
-        dropdown.innerHTML = '';
-        filtrados.forEach(moveName => {
-            const item = document.createElement('div');
-            item.className = 'sugerencia-item';
-            item.textContent = moveName.split('-').join(' ').toUpperCase();
-            
-            item.addEventListener('click', () => {
-                newInput.value = item.textContent;
-                dropdown.innerHTML = '';
-            });
-            dropdown.appendChild(item);
-        });
-    });
+	const txtContador = document.getElementById(`ev-left-${slotId}`);
+	if (txtContador) txtContador.textContent = '512';
 
-    newInput.addEventListener('focus', () => {
-        const query = newInput.value.trim().toLowerCase();
-        const filtrados = movimientosLegales.filter(move => move.includes(query)).slice(0, 5);
-        if(filtrados.length > 0 && query.length > 0) {
-            dropdown.innerHTML = '';
-            filtrados.forEach(moveName => {
-                const item = document.createElement('div');
-                item.className = 'sugerencia-item';
-                item.textContent = moveName.split('-').join(' ').toUpperCase();
-                item.addEventListener('click', () => {
-                    newInput.value = item.textContent;
-                    dropdown.innerHTML = '';
-                });
-                dropdown.appendChild(item);
-            });
-        }
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!newInput.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.innerHTML = '';
-        }
-    });
+	const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
+	keys.forEach((key) => {
+		const baseCell = document.getElementById(`base-${key}-${slotId}`);
+		const totalCell = document.getElementById(`total-${key}-${slotId}`);
+		if (baseCell) baseCell.textContent = '0';
+		if (totalCell) {
+			totalCell.textContent = '0';
+			totalCell.classList.remove('stat-plus', 'stat-minus');
+		}
+	});
 }

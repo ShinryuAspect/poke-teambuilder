@@ -58,7 +58,6 @@ require_once 'header.php';
                 <thead>
                     <tr>
                         <th>Nombre del Equipo</th>
-                        <th>Formato / Tier</th>
                         <th>Fecha de Creación</th>
                         <th>Acciones</th>
                     </tr>
@@ -67,16 +66,19 @@ require_once 'header.php';
                     <?php foreach ($listaEquipos as $equipo): ?>
                         <tr>
                             <td><strong><?= htmlspecialchars($equipo['nombre_equipo']) ?></strong></td>
-                            <td><span class="tier-badge"><?= htmlspecialchars($equipo['formato_tier']) ?></span></td>
                             <td><?= date('d/m/Y H:i', strtotime($equipo['fecha_creacion'])) ?></td>
                             <td>
                                 <button type="button" class="btn-ia action-analyze" data-id="<?= $equipo['id'] ?>">
                                     🤖 Analizar con IA
                                 </button>
                                 
+                                <a href="editar_equipo.php?id=<?= $equipo['id'] ?>" class="btn-ia" style="background-color: #f57c00;">
+                                    ✏️ Editar
+                                </a>
+                                
                                 <a href="dashboard.php?action=eliminar&id=<?= $equipo['id'] ?>" 
                                 class="btn-delete action-delete">
-                                ❌ Eliminar
+                                    ❌ Eliminar
                                 </a>
                             </td>
                         </tr>

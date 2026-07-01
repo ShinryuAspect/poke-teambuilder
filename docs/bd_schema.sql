@@ -17,7 +17,6 @@ CREATE TABLE equipos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     nombre_equipo VARCHAR(100) NOT NULL,
-    formato_tier VARCHAR(50) NOT NULL,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_equipos_usuarios 
         FOREIGN KEY (id_usuario) REFERENCES usuarios (id) 
@@ -38,6 +37,8 @@ CREATE TABLE pokemon (
     movimiento_4 VARCHAR(50) DEFAULT NULL,
     evs_reparticion VARCHAR(100) DEFAULT NULL,
     ivs_reparticion VARCHAR(100) DEFAULT NULL,
+    gender VARCHAR(1) NOT NULL DEFAULT 'N',
+    shiny TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_pokemon_equipos 
         FOREIGN KEY (id_equipo) REFERENCES equipos (id) 
         ON DELETE CASCADE ON UPDATE CASCADE
