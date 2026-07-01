@@ -739,8 +739,8 @@ function calcularStatsDelSlot(slotId) {
 		evTotales += val;
 	});
 
-	if (evTotales > 512) {
-		let exceso = evTotales - 512;
+	if (evTotales > 508) {
+		let exceso = evTotales - 508;
 		for (let i = evInputs.length - 1; i >= 0; i--) {
 			let val = parseInt(evInputs[i].value) || 0;
 			if (val >= exceso) {
@@ -752,11 +752,11 @@ function calcularStatsDelSlot(slotId) {
 				evInputs[i].value = 0;
 			}
 		}
-		evTotales = 512;
+		evTotales = 508;
 	}
 
 	const txtContador = document.getElementById(`ev-left-${slotId}`);
-	if (txtContador) txtContador.textContent = 512 - evTotales;
+	if (txtContador) txtContador.textContent = 508 - evTotales;
 
 	const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 	keys.forEach((key) => {
@@ -864,7 +864,7 @@ function resetearSlot(slotId) {
 		});
 
 	const txtContador = document.getElementById(`ev-left-${slotId}`);
-	if (txtContador) txtContador.textContent = '512';
+	if (txtContador) txtContador.textContent = '508';
 
 	const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 	keys.forEach((key) => {

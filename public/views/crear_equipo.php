@@ -124,7 +124,7 @@ require_once 'header.php';
                             </div>
 
                             <div class="stats-table-container">
-                                <div class="ev-total-counter">EVs Restantes: <span id="ev-left-<?= $i ?>">512</span> / 512</div>
+                                <div class="ev-total-counter">EVs Restantes: <span id="ev-left-<?= $i ?>">508</span> / 508</div>
                                 <table class="stats-table">
                                     <thead>
                                         <tr>
