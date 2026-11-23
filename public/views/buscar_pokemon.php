@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../src/Services/SmogonService.php';
+require_once __DIR__ . '/../../src/services/SmogonService.php';
 
 header('Content-Type: application/json; charset=utf-8');
 

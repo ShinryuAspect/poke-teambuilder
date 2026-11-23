@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../src/Models/Equipo.php';
+require_once __DIR__ . '/../../src/models/Equipo.php';
 
 if (!isset($_SESSION['usuario']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: dashboard.php');

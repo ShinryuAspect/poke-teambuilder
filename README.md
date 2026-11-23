@@ -50,6 +50,10 @@ Requirements: PHP 8+ with the `pdo_mysql` and `curl` extensions, and MySQL or Ma
    ```
 5. Open `http://localhost:8000`, register an account and create your first team.
 
+## Troubleshooting
+
+If Pokémon search returns nothing on Windows (XAMPP/WAMP), PHP may lack a certificate bundle for HTTPS requests. Download `cacert.pem` from curl.se/docs/caextract.html and set `curl.cainfo` to its path in `php.ini`, then restart the server.
+
 ## Project structure
 
 ```

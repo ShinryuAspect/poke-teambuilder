@@ -10,7 +10,6 @@ class SmogonService {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3); 
         curl_setopt($ch, CURLOPT_USERAGENT, 'PokemonTeamBuilderApp/1.0');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
 
         $respuesta = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

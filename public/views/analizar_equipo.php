@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../src/Models/Equipo.php';
-require_once __DIR__ . '/../../src/Services/GeminiService.php';
+require_once __DIR__ . '/../../src/models/Equipo.php';
+require_once __DIR__ . '/../../src/services/GeminiService.php';
 
 header('Content-Type: application/json; charset=utf-8');
 

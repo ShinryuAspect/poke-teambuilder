@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../src/Models/Equipo.php';
+require_once __DIR__ . '/../../src/models/Equipo.php';
 
 if (!isset($_SESSION['usuario'])) {
     header('Location: login.php');

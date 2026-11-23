@@ -50,6 +50,10 @@ Requisitos: PHP 8+ con las extensiones `pdo_mysql` y `curl`, y MySQL o MariaDB.
    ```
 5. Abre `http://localhost:8000`, regístrate y crea tu primer equipo.
 
+## Solución de problemas
+
+Si la búsqueda de Pokémon no devuelve nada en Windows (XAMPP/WAMP), puede que PHP no tenga un paquete de certificados para las peticiones HTTPS. Descarga `cacert.pem` desde curl.se/docs/caextract.html, indica su ruta en `curl.cainfo` dentro de `php.ini` y reinicia el servidor.
+
 ## Estructura del proyecto
 
 ```
