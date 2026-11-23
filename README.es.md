@@ -10,9 +10,9 @@ Proyecto del curso de desarrollo web Full-Stack.
 
 | Inicio de sesión | Panel |
 |---|---|
-| ![Login](docs/readme/login.png) | ![Panel](docs/readme/dashboard.png) |
+| ![Login](docs/screenshots/captura-login.png) | ![Panel](docs/screenshots/captura-dashboard.png) |
 
-![Constructor de equipos](docs/readme/builder.png)
+![Constructor de equipos](docs/screenshots/captura-builder.png)
 
 ## Funcionalidades
 

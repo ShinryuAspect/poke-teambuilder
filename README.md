@@ -10,9 +10,9 @@ Built as a course project (Full-Stack web development).
 
 | Login | Dashboard |
 |---|---|
-| ![Login](docs/readme/login.png) | ![Dashboard](docs/readme/dashboard.png) |
+| ![Login](docs/screenshots/captura-login.png) | ![Dashboard](docs/screenshots/captura-dashboard.png) |
 
-![Team builder](docs/readme/builder.png)
+![Team builder](docs/screenshots/captura-builder.png)
 
 ## Features
 
