@@ -1,100 +1,65 @@
-# 🚀 Pokémon Team Builder & Live AI Translator
+**English** · [Español](README.es.md)
 
-Un creador de equipos competitivos de Pokémon desarrollado en **PHP 8 (POO)** y **MySQL**, integrado con **PokéAPI** para la extracción de especies, sprites, tipos y movimientos, combinando el potencial de la Inteligencia Artificial mediante la **API de Google Gemini** para ofrecer traducción y adaptación técnica en vivo al castellano.
+# Pokémon Team Builder
 
-Este proyecto ha sido desarrollado como trabajo final para el curso de especialización profesional en Desarrollo Web.
+A PHP/MySQL web app to build, save and edit competitive Pokémon teams in a Showdown-style interface, using live data from [PokéAPI](https://pokeapi.co/).
 
----
+Built as a course project (Full-Stack web development).
 
-## 🛠️ Arquitectura y Tecnologías Utilizadas
+## Screenshots
 
-- **Backend:** PHP 8.x (Programación Orientada a Objetos, PDO, Gestión de Sesiones Segura).
-- **Base de Datos:** MySQL / MariaDB (Motor InnoDB, Restricciones de integridad referencial y borrado en cascada).
-- **Frontend:** HTML5 semántico, CSS3 moderno (Flexbox & Grid Layout) y JavaScript nativo (Vanilla JS) mediante consumo asíncrono con **Fetch API**.
-- **APIs Externas Integradas:**
-    - PokéAPI - Repositorio de datos de especies, sprites, tipos, movimientos y objetos.
-    - Google Gemini API (1.5 Flash) - Traducción contextual, interpretación y adaptación de la terminología técnica del metajuego.
+| Login | Dashboard |
+|---|---|
+| ![Login](docs/readme/login.png) | ![Dashboard](docs/readme/dashboard.png) |
 
----
+![Team builder](docs/readme/builder.png)
 
-## 🔑 Características Clave e Implementación de Requisitos
+## Features
 
-- **Seguridad Primero:**
-    - Prevención total de _SQL Injection_ mediante el uso estricto de **consultas preparadas con PDO**.
-    - Almacenamiento seguro de credenciales utilizando hashes criptográficos robustos con `password_hash()`.
-    - Control de acceso perimetral según el rol del usuario (`user` / `admin`).
-    - Sanitización de datos de salida con `htmlspecialchars()` para prevenir ataques XSS (Cross-Site Scripting).
-- **Optimización del rendimiento (Capa de Caché):** Enfoque híbrido mediante una tabla local `traducciones_cache` que almacena los textos traducidos previamente por la IA de Gemini indexados por hash SHA-1. Esto reduce la latencia de carga de segundos a milisegundos y mitiga el agotamiento de cuota de la API gratuita.
-- **Team Builder Dinámico:** Creación, edición, lectura y borrado (CRUD) de combinaciones de hasta 6 Pokémon por equipo.
-    - Carga automática de sprites oficiales según especie, sexo y variación shiny cuando la especie lo permite.
-    - Bloqueo inteligente del selector de género en especies sin género o con género único.
-    - Autocompletado desplegable de Pokémon, objetos, movimientos y habilidades con normalización visual del texto.
-    - Recalculo inmediato de stats al seleccionar un Pokémon, sin depender de modificar naturaleza, EVs o IVs manualmente.
+- Account registration and login (bcrypt-hashed passwords, PDO prepared statements).
+- Dashboard listing your saved teams, with create, edit and delete.
+- Team builder with six slots. Each slot supports:
+  - Pokémon search with autocomplete over the full National Dex, with sprite, gender and shiny toggle.
+  - Held item, ability and nature selection.
+  - Four moves restricted to those the Pokémon can legally learn in Scarlet/Violet.
+  - EV/IV editor (252 per stat, 508 total) with live final-stat calculation.
+- PokéAPI lists (Pokémon, items, abilities) are cached in the browser with IndexedDB to avoid repeated requests.
+- The interface is in Spanish.
 
----
+## Status
 
-## 📂 Estructura del Proyecto
+- The "Analizar con IA" button currently returns a placeholder text. The Gemini integration (`src/services/GeminiService.php`) is not implemented yet.
 
-El proyecto sigue una arquitectura limpia que separa las responsabilidades del sistema (Lógica / Vistas / Endpoints asíncronos):
+## Tech stack
 
-```text
-poke-teambuilder/
-├── config/              # Parámetros globales y conexión PDO (Singleton)
-├── src/                 # Núcleo del Backend (POO)
-│   ├── Models/          # Entidades de Base de Datos (Usuario, Equipo, Pokemon)
-│   └── Services/        # Capa de servicios externos (GeminiService, búsqueda PokéAPI)
-├── public/              # Directorio raíz del servidor web público
-│   ├── api/             # Endpoints asíncronos que devuelven JSON
-│   ├── assets/          # Recursos estáticos (CSS, JS, imágenes locales)
-│   └── views/           # Plantillas y componentes visuales de la interfaz
-└── docs/                # Documentación del proyecto y esquemas de BD
+PHP 8 · MySQL / MariaDB (PDO) · Vanilla JavaScript · HTML/CSS · PokéAPI
+
+## Getting started
+
+Requirements: PHP 8+ with the `pdo_mysql` and `curl` extensions, and MySQL or MariaDB.
+
+1. Clone the repository.
+2. Create the database by importing the schema:
+   ```bash
+   mysql -u root -p < docs/bd_schema.sql
+   ```
+3. Set your database credentials in `config/config.php`.
+4. Start the development server:
+   ```bash
+   php -S localhost:8000 -t public
+   ```
+5. Open `http://localhost:8000`, register an account and create your first team.
+
+## Project structure
+
+```
+config/        database connection and settings
+docs/          schema, project deliverables and screenshots
+public/        entry point, views, CSS and JavaScript
+src/models/    Usuario and Equipo (database access)
+src/services/  SmogonService (PokéAPI lookup), GeminiService (pending)
 ```
 
----
+## Credits
 
-## 🚀 Instalación y Configuración Local
-
-Sigue estos pasos para replicar el entorno de desarrollo localmente:
-
-### 1. Clonar el repositorio
-
-Para descargar el código en tu máquina local, ejecuta:
-
-```bash
-git clone [https://github.com/tu-usuario/nombre-del-repositorio.git](https://github.com/tu-usuario/nombre-del-repositorio.git)
-cd nombre-del-repositorio
-```
-
-### 2. Configurar la Base de Datos
-
-1. Inicia tu servidor local de bases de datos (XAMPP, Laragon, etc.).
-2. Importa el archivo ubicado en `docs/bd_schema.sql` en tu gestor de bases de datos (PHPMyAdmin/MariaDB).
-3. Asegúrate de configurar tus credenciales de conexión en el archivo de configuración global `config/config.php`.
-
-### 3. Configurar Variables de Entorno / API Key
-
-Para que la traducción en vivo funcione, necesitas una clave de API de Google AI Studio. Define tu constante en tu archivo de configuración de esta manera:
-
-```php
-define('GEMINI_API_KEY', 'TU_API_KEY_AQUI');
-```
-
----
-
-## 🎯 Plan de Trabajo y Entregables (Hoja de Ruta)
-
-- [x] **Entregable 1:** Análisis, Planificación y Definición de Requisitos.
-- [x] **Entregable 2:** Diseño Conceptual, Modelo Entidad-Relación y Script DDL.
-- [ ] **Entregable 3:** Desarrollo del Sistema de Autenticación, persistencia base y pruebas de interconexión con APIs.
-- [ ] **Entregable 4:** Maquetación del Frontend, implementación de caché de traducción, memoria final y presentación.
-
-## 📦 Compatibilidad y Evolución
-
-- El proyecto deja documentada como vía de evolución la exportación e importación interoperable de equipos y Pokémon para compatibilidad con Pokémon Showdown y otras herramientas externas.
-- La memoria final incluye capturas reales del flujo principal para facilitar la defensa y la demostración del producto.
-
----
-
-## 📝 Licencia
-
-Este proyecto es de uso estrictamente académico e informativo. Los datos relativos a las marcas, mecánicas y criaturas de Pokémon son propiedad de _The Pokémon Company_, _Game Freak_ y _Nintendo_.
+Pokémon data and sprites come from [PokéAPI](https://pokeapi.co/). Pokémon is a trademark of Nintendo, Game Freak and Creatures Inc.; this is a non-commercial fan project with no affiliation.
